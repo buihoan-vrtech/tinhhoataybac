@@ -1,0 +1,1 @@
+console.log("Tinh Hoa Tây Bắc đã chạy.");
