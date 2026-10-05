@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<footer class="footer"
+        th:fragment="footer">
+
+    <div class="container footer-grid">
+
+        <!-- COLUMN 1 -->
+        <div>
+
+            <div class="footer-logo">
+
+                <div class="logo-icon">
+                    ⛰
+                </div>
+
+                <div class="logo-text">
+
+                    <strong>
+                        TINH HOA
+                    </strong>
+
+                    <span>
+                        TÂY BẮC
+                    </span>
+
+                </div>
+
+            </div>
+
+            <p class="footer-description">
+
+                Nơi hội tụ những đặc sản tinh túy,
+                mang đậm bản sắc của vùng núi Tây Bắc.
+
+            </p>
+
+        </div>
+
+
+        <!-- COLUMN 2 -->
+        <div class="footer-column">
+
+            <h4>
+                Liên kết
+            </h4>
+
+            <a th:href="@{/}">
+                Trang chủ
+            </a>
+
+            <a th:href="@{/products}">
+                Sản phẩm
+            </a>
+
+            <a href="#">
+                Giới thiệu
+            </a>
+
+            <a href="#">
+                Liên hệ
+            </a>
+
+        </div>
+
+
+        <!-- COLUMN 3 -->
+        <div class="footer-column">
+
+            <h4>
+                Hỗ trợ khách hàng
+            </h4>
+
+            <a href="#">
+                Chính sách giao hàng
+            </a>
+
+            <a href="#">
+                Chính sách đổi trả
+            </a>
+
+            <a href="#">
+                Hướng dẫn mua hàng
+            </a>
+
+            <a href="#">
+                Câu hỏi thường gặp
+            </a>
+
+        </div>
+
+
+        <!-- COLUMN 4 -->
+        <div class="footer-column">
+
+            <h4>
+                Liên hệ
+            </h4>
+
+            <p>
+                📍 Số 124, Trịnh Văn Bô,
+                Nam Từ Liêm, Hà Nội
+            </p>
+
+            <p>
+                ☎ 0941943628
+            </p>
+
+            <p>
+                ✉ tinhhoataybac@gmail.com
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        © 2026 Tinh Hoa Tây Bắc.
+        All rights reserved.
+
+    </div>
+
+</footer>
+
+</body>
+</html>

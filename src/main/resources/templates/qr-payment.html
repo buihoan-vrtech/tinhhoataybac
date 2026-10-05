@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Thanh toán QR | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="qr-payment-page">
+
+    <div class="container">
+
+
+        <div class="qr-payment-box">
+
+
+            <div class="qr-left">
+
+                <h1>
+                    Thanh toán bằng QR
+                </h1>
+
+                <p>
+                    Sử dụng ứng dụng ngân hàng để quét mã bên dưới.
+                </p>
+
+
+                <img class="qr-image"
+                     th:src="${qrUrl}"
+                     alt="QR thanh toán">
+
+
+            </div>
+
+
+
+            <div class="qr-right">
+
+
+                <h2>
+                    Thông tin đơn hàng
+                </h2>
+
+
+                <div class="qr-info-row">
+
+                    <span>
+                        Mã đơn hàng
+                    </span>
+
+                    <strong th:text="'#' + ${order.id}">
+                        #1
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-info-row">
+
+                    <span>
+                        Nội dung chuyển khoản
+                    </span>
+
+                    <strong th:text="${order.paymentCode}">
+                        THB1
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-info-row">
+
+                    <span>
+                        Ngân hàng
+                    </span>
+
+                    <strong th:text="${bankId}">
+                        BANK
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-info-row">
+
+                    <span>
+                        Số tài khoản
+                    </span>
+
+                    <strong th:text="${accountNo}">
+                        000000
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-info-row">
+
+                    <span>
+                        Chủ tài khoản
+                    </span>
+
+                    <strong th:text="${accountName}">
+                        ACCOUNT NAME
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-total">
+
+                    <span>
+                        Số tiền
+                    </span>
+
+                    <strong th:text="${#numbers.formatDecimal(
+                    order.totalAmount,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    ) + 'đ'}">
+
+                        0đ
+
+                    </strong>
+
+                </div>
+
+
+                <div class="qr-warning">
+
+                    <strong>
+                        Lưu ý
+                    </strong>
+
+                    <p>
+                        Vui lòng chuyển đúng số tiền và giữ nguyên
+                        nội dung chuyển khoản để cửa hàng dễ đối soát.
+                    </p>
+
+                </div>
+
+
+                <form th:action="@{/payment/qr/complete}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="orderId"
+                           th:value="${order.id}">
+
+                    <button type="submit"
+                            class="qr-complete-btn">
+
+                        Tôi đã thanh toán
+
+                    </button>
+
+                </form>
+
+
+                <p class="qr-status-note">
+
+                    Sau khi bạn chuyển khoản,
+                    đơn hàng sẽ ở trạng thái
+                    <strong>chờ xác nhận thanh toán</strong>.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
+</html>

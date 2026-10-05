@@ -1,10 +1,474 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Giỏ hàng | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
 </head>
+
 <body>
+
+
+<!-- HEADER -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+<!-- =====================================================
+     PAGE HEADER
+===================================================== -->
+
+<section class="cart-page-header">
+
+    <div class="container">
+
+
+        <p class="products-breadcrumb">
+
+            <a th:href="@{/}">
+                Trang chủ
+            </a>
+
+            /
+
+            <span>
+                Giỏ hàng
+            </span>
+
+        </p>
+
+
+        <h1>
+            Giỏ hàng của bạn
+        </h1>
+
+
+        <p>
+            Kiểm tra sản phẩm trước khi tiến hành thanh toán
+        </p>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CART
+===================================================== -->
+
+<section class="cart-page">
+
+    <div class="container">
+
+
+
+        <!-- =================================================
+             CART CÓ SẢN PHẨM
+        ================================================= -->
+
+        <div class="cart-layout"
+             th:if="${cartItems != null and !#lists.isEmpty(cartItems)}">
+
+
+
+            <!-- LEFT -->
+
+            <div class="cart-items-box">
+
+
+                <!-- HEADER -->
+
+                <div class="cart-table-header">
+
+                    <div>
+                        Sản phẩm
+                    </div>
+
+                    <div>
+                        Đơn giá
+                    </div>
+
+                    <div>
+                        Số lượng
+                    </div>
+
+                    <div>
+                        Thành tiền
+                    </div>
+
+                    <div>
+                    </div>
+
+                </div>
+
+
+
+                <!-- ITEMS -->
+
+                <div class="cart-item"
+                     th:each="item : ${cartItems}">
+
+
+
+                    <!-- PRODUCT -->
+
+                    <div class="cart-product">
+
+
+                        <a th:href="@{/products/{id}(id=${item.product.id})}"
+                           class="cart-product-image">
+
+                            <img th:src="${item.product.image}"
+                                 th:alt="${item.product.name}">
+
+                        </a>
+
+
+
+                        <div class="cart-product-info">
+
+
+                            <span class="cart-product-category"
+                                  th:text="${item.product.category != null
+                                  ? item.product.category.name
+                                  : 'Đặc sản Tây Bắc'}">
+
+                                Danh mục
+
+                            </span>
+
+
+                            <h3>
+
+                                <a th:href="@{/products/{id}(id=${item.product.id})}"
+                                   th:text="${item.product.name}">
+
+                                    Tên sản phẩm
+
+                                </a>
+
+                            </h3>
+
+
+                            <span class="cart-stock"
+                                  th:if="${item.product.stock != null}">
+
+                                Kho:
+
+                                <strong th:text="${item.product.stock}">
+                                    0
+                                </strong>
+
+                            </span>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- PRICE -->
+
+                    <div class="cart-price"
+                         th:text="${#numbers.formatDecimal(
+                         item.product.price,
+                         0,
+                         'POINT',
+                         0,
+                         'COMMA'
+                         ) + 'đ'}">
+
+                        0đ
+
+                    </div>
+
+
+
+                    <!-- QUANTITY -->
+
+                    <div class="cart-quantity">
+
+
+                        <form th:action="@{/cart/update}"
+                              method="post"
+                              class="cart-update-form">
+
+
+                            <input type="hidden"
+                                   name="productId"
+                                   th:value="${item.product.id}">
+
+
+                            <input type="number"
+                                   name="quantity"
+                                   min="1"
+                                   th:attr="max=${item.product.stock}"
+                                   th:value="${item.quantity}">
+
+
+                            <button type="submit">
+                                Cập nhật
+                            </button>
+
+
+                        </form>
+
+
+                    </div>
+
+
+
+                    <!-- SUBTOTAL -->
+
+                    <div class="cart-subtotal"
+                         th:text="${#numbers.formatDecimal(
+                         item.subtotal,
+                         0,
+                         'POINT',
+                         0,
+                         'COMMA'
+                         ) + 'đ'}">
+
+                        0đ
+
+                    </div>
+
+
+
+                    <!-- REMOVE -->
+
+                    <div class="cart-remove">
+
+
+                        <form th:action="@{/cart/remove}"
+                              method="post">
+
+
+                            <input type="hidden"
+                                   name="productId"
+                                   th:value="${item.product.id}">
+
+
+                            <button type="submit"
+                                    title="Xóa sản phẩm">
+
+                                ✕
+
+                            </button>
+
+
+                        </form>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- BOTTOM -->
+
+                <div class="cart-bottom-actions">
+
+
+                    <a th:href="@{/products}"
+                       class="continue-shopping">
+
+                        ← Tiếp tục mua hàng
+
+                    </a>
+
+
+                    <form th:action="@{/cart/clear}"
+                          method="post">
+
+
+                        <button type="submit"
+                                class="clear-cart-btn">
+
+                            Xóa toàn bộ giỏ hàng
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SUMMARY
+            ================================================= -->
+
+            <aside class="cart-summary">
+
+
+                <h2>
+                    Tổng đơn hàng
+                </h2>
+
+
+
+                <div class="summary-row">
+
+
+                    <span>
+                        Tổng số lượng
+                    </span>
+
+
+                    <strong>
+
+                        <span th:text="${cartCount}">
+                            0
+                        </span>
+
+                        sản phẩm
+
+                    </strong>
+
+
+                </div>
+
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Phí vận chuyển
+                    </span>
+
+                    <strong>
+                        Miễn phí
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-total">
+
+                    <span>
+                        Tổng cộng
+                    </span>
+
+
+                    <strong th:text="${#numbers.formatDecimal(
+                    cartTotal,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    ) + 'đ'}">
+
+                        0đ
+
+                    </strong>
+
+                </div>
+
+
+
+                <!-- CHECKOUT -->
+
+                <a th:href="@{/checkout}"
+                   class="checkout-btn">
+
+                    Tiến hành thanh toán
+
+                </a>
+
+
+
+                <div class="cart-summary-note">
+
+                    <p>
+                        🔒 Thanh toán an toàn
+                    </p>
+
+                    <p>
+                        🚚 Giao hàng toàn quốc
+                    </p>
+
+                    <p>
+                        ✅ Cam kết chất lượng
+                    </p>
+
+                </div>
+
+
+            </aside>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             EMPTY CART
+        ================================================= -->
+
+        <div class="empty-cart"
+             th:if="${cartItems == null or #lists.isEmpty(cartItems)}">
+
+
+            <div class="empty-cart-icon">
+                🛒
+            </div>
+
+
+            <h2>
+                Giỏ hàng đang trống
+            </h2>
+
+
+            <p>
+                Bạn chưa thêm sản phẩm nào vào giỏ hàng.
+            </p>
+
+
+            <a th:href="@{/products}"
+               class="btn-primary">
+
+                Khám phá sản phẩm
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- FOOTER -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<script th:src="@{/js/main.js}"></script>
 
 </body>
 </html>

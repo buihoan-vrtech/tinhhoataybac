@@ -1,21 +1,683 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Tinh Hoa Tây Bắc</title>
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
 </head>
 
 <body>
 
-<h1>Tinh Hoa Tây Bắc</h1>
 
-<p>Website bán đặc sản Tây Bắc</p>
+<!-- HEADER DÙNG CHUNG -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-<script src="/js/main.js"></script>
+
+
+<!-- =====================================================
+     HERO SLIDER
+===================================================== -->
+
+<section class="hero">
+
+    <div class="slider">
+
+
+        <!-- SLIDE 1 -->
+
+        <div class="slide active">
+
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836"
+                 alt="Đặc sản Tây Bắc">
+
+            <div class="slide-overlay"></div>
+
+            <div class="slide-content container">
+
+                <div class="slide-text">
+
+                    <span class="slide-label">
+                        TINH HOA NÚI RỪNG
+                    </span>
+
+                    <h1>
+                        Đậm vị Tây Bắc
+                        <br>
+                        Gửi trọn yêu thương
+                    </h1>
+
+                    <p>
+                        Khám phá những đặc sản nổi tiếng,
+                        được tuyển chọn từ vùng cao Tây Bắc.
+                    </p>
+
+                    <a th:href="@{/products}"
+                       class="btn-primary">
+                        Khám phá ngay
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SLIDE 2 -->
+
+        <div class="slide">
+
+            <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950"
+                 alt="Ẩm thực Tây Bắc">
+
+            <div class="slide-overlay"></div>
+
+            <div class="slide-content container">
+
+                <div class="slide-text">
+
+                    <span class="slide-label">
+                        ĐẶC SẢN CHÍNH GỐC
+                    </span>
+
+                    <h1>
+                        Hương vị núi rừng
+                        <br>
+                        Trong từng món ăn
+                    </h1>
+
+                    <p>
+                        Thịt trâu gác bếp, gia vị,
+                        mật ong và nhiều đặc sản hấp dẫn.
+                    </p>
+
+                    <a th:href="@{/products}"
+                       class="btn-primary">
+                        Xem sản phẩm
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SLIDE 3 -->
+
+        <div class="slide">
+
+            <img src="https://images.unsplash.com/photo-1547592180-85f173990554"
+                 alt="Đặc sản vùng cao">
+
+            <div class="slide-overlay"></div>
+
+            <div class="slide-content container">
+
+                <div class="slide-text">
+
+                    <span class="slide-label">
+                        QUÀ TẶNG Ý NGHĨA
+                    </span>
+
+                    <h1>
+                        Món quà đặc biệt
+                        <br>
+                        Từ miền Tây Bắc
+                    </h1>
+
+                    <p>
+                        Những sản phẩm tinh tế dành cho
+                        gia đình, bạn bè và đối tác.
+                    </p>
+
+                    <a th:href="@{/products}"
+                       class="btn-primary">
+                        Chọn quà ngay
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- BUTTON -->
+
+        <button class="slider-btn prev"
+                type="button">
+            ❮
+        </button>
+
+        <button class="slider-btn next"
+                type="button">
+            ❯
+        </button>
+
+
+
+        <!-- DOT -->
+
+        <div class="slider-dots">
+
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     BENEFITS
+===================================================== -->
+
+<section class="benefits">
+
+    <div class="container benefit-grid">
+
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                🚚
+            </div>
+
+            <div>
+
+                <h4>
+                    Giao hàng toàn quốc
+                </h4>
+
+                <p>
+                    Nhanh chóng và an toàn
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                ✅
+            </div>
+
+            <div>
+
+                <h4>
+                    Cam kết chất lượng
+                </h4>
+
+                <p>
+                    Sản phẩm tuyển chọn kỹ
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                🌿
+            </div>
+
+            <div>
+
+                <h4>
+                    Đặc sản chính gốc
+                </h4>
+
+                <p>
+                    Hương vị chuẩn Tây Bắc
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="benefit-item">
+
+            <div class="benefit-icon">
+                ☎
+            </div>
+
+            <div>
+
+                <h4>
+                    Hỗ trợ tận tâm
+                </h4>
+
+                <p>
+                    Tư vấn nhanh chóng
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CATEGORY
+===================================================== -->
+
+<section class="section category-section">
+
+    <div class="container">
+
+
+        <div class="section-heading">
+
+            <span>
+                KHÁM PHÁ
+            </span>
+
+            <h2>
+                Danh mục đặc sản
+            </h2>
+
+            <p>
+                Những hương vị đặc trưng của vùng núi Tây Bắc
+            </p>
+
+        </div>
+
+
+
+        <div class="category-grid">
+
+
+            <a th:href="@{/products(categoryId=1)}"
+               class="category-card">
+
+                <div class="category-image">
+
+                    <img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7"
+                         alt="Thịt gác bếp">
+
+                </div>
+
+                <h3>
+                    Thịt gác bếp
+                </h3>
+
+                <p>
+                    Đậm đà hương vị núi rừng
+                </p>
+
+            </a>
+
+
+
+            <a th:href="@{/products(categoryId=2)}"
+               class="category-card">
+
+                <div class="category-image">
+
+                    <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d"
+                         alt="Gia vị Tây Bắc">
+
+                </div>
+
+                <h3>
+                    Gia vị Tây Bắc
+                </h3>
+
+                <p>
+                    Chuẩn vị miền sơn cước
+                </p>
+
+            </a>
+
+
+
+            <a th:href="@{/products(categoryId=3)}"
+               class="category-card">
+
+                <div class="category-image">
+
+                    <img src="https://images.unsplash.com/photo-1606923829579-0cb981a83e2e"
+                         alt="Mật ong Tây Bắc">
+
+                </div>
+
+                <h3>
+                    Mật ong Tây Bắc
+                </h3>
+
+                <p>
+                    Tinh túy từ thiên nhiên
+                </p>
+
+            </a>
+
+
+
+            <a th:href="@{/products(categoryId=4)}"
+               class="category-card">
+
+                <div class="category-image">
+
+                    <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574"
+                         alt="Chè Tây Bắc">
+
+                </div>
+
+                <h3>
+                    Chè Tây Bắc
+                </h3>
+
+                <p>
+                    Hương thơm thanh khiết
+                </p>
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FEATURED PRODUCTS
+===================================================== -->
+
+<section class="section products-section">
+
+    <div class="container">
+
+
+        <div class="section-heading">
+
+            <span>
+                NỔI BẬT
+            </span>
+
+            <h2>
+                Sản phẩm nổi bật
+            </h2>
+
+            <p>
+                Những sản phẩm được khách hàng yêu thích
+            </p>
+
+        </div>
+
+
+
+        <div class="product-grid"
+             th:if="${products != null and !#lists.isEmpty(products)}">
+
+
+            <div class="product-card"
+                 th:each="product : ${products}">
+
+
+                <div class="product-image">
+
+
+                    <span class="product-badge"
+                          th:if="${product.featured}">
+                        Nổi bật
+                    </span>
+
+
+                    <img th:src="${product.image}"
+                         th:alt="${product.name}">
+
+
+                    <a th:href="@{/products/{id}(id=${product.id})}"
+                       class="quick-add"
+                       title="Xem chi tiết">
+                        👁
+                    </a>
+
+
+                </div>
+
+
+
+                <div class="product-info">
+
+
+                    <span class="product-category"
+                          th:text="${product.category != null
+                          ? product.category.name
+                          : 'Đặc sản Tây Bắc'}">
+
+                        Danh mục
+
+                    </span>
+
+
+                    <h3>
+
+                        <a th:href="@{/products/{id}(id=${product.id})}"
+                           th:text="${product.name}">
+
+                            Tên sản phẩm
+
+                        </a>
+
+                    </h3>
+
+
+                    <div class="rating">
+                        ★★★★★
+                    </div>
+
+
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(
+                         product.price,
+                         0,
+                         'POINT',
+                         0,
+                         'COMMA'
+                         ) + 'đ'}">
+
+                        0đ
+
+                    </div>
+
+
+                    <div class="product-stock"
+                         th:if="${product.stock != null}">
+
+                        Còn
+
+                        <strong th:text="${product.stock}">
+                            0
+                        </strong>
+
+                        sản phẩm
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="empty-products"
+             th:if="${products == null or #lists.isEmpty(products)}">
+
+            <div class="empty-products-icon">
+                🛍
+            </div>
+
+            <h3>
+                Chưa có sản phẩm nổi bật
+            </h3>
+
+            <p>
+                Sản phẩm sẽ được cập nhật trong thời gian sớm nhất.
+            </p>
+
+        </div>
+
+
+
+        <div class="center-button">
+
+            <a th:href="@{/products}"
+               class="btn-outline">
+
+                Xem tất cả sản phẩm
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     STORY
+===================================================== -->
+
+<section class="story-section">
+
+    <div class="container story-grid">
+
+
+        <div class="story-image">
+
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+                 alt="Tinh Hoa Tây Bắc">
+
+        </div>
+
+
+
+        <div class="story-content">
+
+            <span class="story-label">
+                CÂU CHUYỆN CỦA CHÚNG TÔI
+            </span>
+
+            <h2>
+                Mang tinh hoa Tây Bắc đến mọi gia đình
+            </h2>
+
+            <p>
+                Tinh Hoa Tây Bắc mong muốn mang những đặc sản
+                chất lượng, mang đậm bản sắc của đồng bào vùng cao
+                đến gần hơn với khách hàng trên khắp Việt Nam.
+            </p>
+
+            <p>
+                Mỗi sản phẩm đều được chọn lựa kỹ lưỡng,
+                giữ nguyên hương vị truyền thống và nét văn hóa
+                đặc trưng của vùng Tây Bắc.
+            </p>
+
+            <a th:href="@{/products}"
+               class="btn-primary">
+                Khám phá sản phẩm
+            </a>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     NEWSLETTER
+===================================================== -->
+
+<section class="newsletter">
+
+    <div class="container newsletter-content">
+
+
+        <div>
+
+            <h2>
+                Nhận ưu đãi từ Tinh Hoa Tây Bắc
+            </h2>
+
+            <p>
+                Đăng ký email để nhận thông tin sản phẩm mới
+                và chương trình khuyến mãi.
+            </p>
+
+        </div>
+
+
+        <form class="newsletter-form">
+
+            <input type="email"
+                   placeholder="Nhập email của bạn">
+
+            <button type="submit">
+                Đăng ký
+            </button>
+
+        </form>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- FOOTER DÙNG CHUNG -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<script th:src="@{/js/main.js}"></script>
 
 </body>
 </html>

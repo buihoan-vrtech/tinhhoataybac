@@ -1,10 +1,339 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${product.name} + ' | Tinh Hoa Tây Bắc'">
+        Chi tiết sản phẩm
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
 </head>
+
 <body>
+
+
+<!-- HEADER -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+<!-- =====================================================
+     BREADCRUMB
+===================================================== -->
+
+<section class="detail-breadcrumb">
+
+    <div class="container">
+
+        <a th:href="@{/}">
+            Trang chủ
+        </a>
+
+        <span>/</span>
+
+        <a th:href="@{/products}">
+            Sản phẩm
+        </a>
+
+        <span>/</span>
+
+        <span th:text="${product.name}">
+            Tên sản phẩm
+        </span>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     PRODUCT DETAIL
+===================================================== -->
+
+<section class="product-detail-page">
+
+    <div class="container product-detail-grid">
+
+
+        <!-- IMAGE -->
+
+        <div class="product-detail-image">
+
+
+            <span class="product-detail-badge"
+                  th:if="${product.featured}">
+
+                Sản phẩm nổi bật
+
+            </span>
+
+
+            <img th:src="${product.image}"
+                 th:alt="${product.name}">
+
+
+        </div>
+
+
+
+        <!-- INFO -->
+
+        <div class="product-detail-info">
+
+
+            <div class="detail-category"
+                 th:text="${product.category != null
+                 ? product.category.name
+                 : 'Đặc sản Tây Bắc'}">
+
+                Danh mục
+
+            </div>
+
+
+
+            <h1 th:text="${product.name}">
+                Tên sản phẩm
+            </h1>
+
+
+
+            <div class="detail-rating">
+
+                <span>
+                    ★★★★★
+                </span>
+
+                <small>
+                    Sản phẩm chất lượng
+                </small>
+
+            </div>
+
+
+
+            <div class="detail-price"
+                 th:text="${#numbers.formatDecimal(
+                 product.price,
+                 0,
+                 'POINT',
+                 0,
+                 'COMMA'
+                 ) + 'đ'}">
+
+                0đ
+
+            </div>
+
+
+
+            <!-- STOCK -->
+
+            <div class="detail-stock"
+                 th:if="${product.stock != null}">
+
+
+                <span>
+                    Tình trạng:
+                </span>
+
+
+                <strong th:if="${product.stock > 0}">
+                    Còn hàng
+                </strong>
+
+
+                <strong th:if="${product.stock <= 0}"
+                        style="color:#b14f3b;">
+                    Hết hàng
+                </strong>
+
+
+                <span th:if="${product.stock > 0}">
+
+                    (
+                    <span th:text="${product.stock}">
+                        0
+                    </span>
+                    sản phẩm
+                    )
+
+                </span>
+
+
+            </div>
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="detail-description">
+
+                <h3>
+                    Mô tả sản phẩm
+                </h3>
+
+                <p th:text="${product.description}">
+                    Mô tả sản phẩm
+                </p>
+
+            </div>
+
+
+
+            <!-- ADD CART -->
+
+            <form th:action="@{/cart/add}"
+                  method="post"
+                  class="detail-buy-box"
+                  th:if="${product.stock != null and product.stock > 0}">
+
+
+                <input type="hidden"
+                       name="productId"
+                       th:value="${product.id}">
+
+
+                <div class="quantity-group">
+
+
+                    <label for="quantity">
+                        Số lượng
+                    </label>
+
+
+                    <div class="quantity-control">
+
+
+                        <button type="button"
+                                class="quantity-btn minus">
+                            −
+                        </button>
+
+
+                        <input id="quantity"
+                               type="number"
+                               name="quantity"
+                               value="1"
+                               min="1"
+                               th:attr="max=${product.stock}">
+
+
+                        <button type="button"
+                                class="quantity-btn plus">
+                            +
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <button type="submit"
+                        class="add-to-cart-btn">
+
+                    🛒 Thêm vào giỏ hàng
+
+                </button>
+
+
+            </form>
+
+
+
+            <!-- OUT OF STOCK -->
+
+            <div th:if="${product.stock == null or product.stock <= 0}">
+
+                <button type="button"
+                        class="add-to-cart-btn"
+                        disabled>
+
+                    Sản phẩm đã hết hàng
+
+                </button>
+
+            </div>
+
+
+
+            <!-- BENEFITS -->
+
+            <div class="detail-benefits">
+
+                <div>
+                    🚚 Giao hàng toàn quốc
+                </div>
+
+                <div>
+                    ✅ Cam kết sản phẩm chất lượng
+                </div>
+
+                <div>
+                    🌿 Đặc sản Tây Bắc chính gốc
+                </div>
+
+                <div>
+                    🔒 Thanh toán an toàn
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     EXTRA INFO
+===================================================== -->
+
+<section class="product-extra-info">
+
+    <div class="container">
+
+
+        <div class="product-info-box">
+
+            <h2>
+                Thông tin sản phẩm
+            </h2>
+
+            <p th:text="${product.description}">
+                Thông tin chi tiết sản phẩm
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- FOOTER -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<script th:src="@{/js/main.js}"></script>
 
 </body>
 </html>

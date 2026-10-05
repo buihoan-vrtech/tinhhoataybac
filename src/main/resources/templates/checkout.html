@@ -1,10 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Thanh toán | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
 </head>
+
 <body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="checkout-header">
+
+    <div class="container">
+
+        <p class="products-breadcrumb">
+
+            <a th:href="@{/}">
+                Trang chủ
+            </a>
+
+            /
+
+            <a th:href="@{/cart}">
+                Giỏ hàng
+            </a>
+
+            /
+
+            <span>
+                Thanh toán
+            </span>
+
+        </p>
+
+        <h1>
+            Thanh toán
+        </h1>
+
+        <p>
+            Hoàn tất thông tin để đặt hàng
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="checkout-page">
+
+    <div class="container">
+
+
+        <div class="checkout-error"
+             th:if="${error != null}"
+             th:text="${error}">
+        </div>
+
+
+        <form th:action="@{/checkout/place-order}"
+              method="post"
+              class="checkout-layout">
+
+
+            <!-- LEFT -->
+
+            <div class="checkout-form-box">
+
+
+                <h2>
+                    Thông tin nhận hàng
+                </h2>
+
+
+                <div class="checkout-field">
+
+                    <label>
+                        Họ và tên *
+                    </label>
+
+                    <input type="text"
+                           name="customerName"
+                           required
+                           placeholder="Nhập họ và tên">
+
+                </div>
+
+
+                <div class="checkout-row">
+
+
+                    <div class="checkout-field">
+
+                        <label>
+                            Số điện thoại *
+                        </label>
+
+                        <input type="tel"
+                               name="phone"
+                               required
+                               placeholder="Ví dụ: 0912345678">
+
+                    </div>
+
+
+                    <div class="checkout-field">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input type="email"
+                               name="email"
+                               placeholder="example@gmail.com">
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="checkout-field">
+
+                    <label>
+                        Địa chỉ nhận hàng *
+                    </label>
+
+                    <textarea name="address"
+                              rows="3"
+                              required
+                              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+
+                </div>
+
+
+                <div class="checkout-field">
+
+                    <label>
+                        Ghi chú đơn hàng
+                    </label>
+
+                    <textarea name="note"
+                              rows="4"
+                              placeholder="Ghi chú thêm cho cửa hàng"></textarea>
+
+                </div>
+
+
+
+                <!-- PAYMENT -->
+
+                <div class="payment-methods">
+
+                    <h2>
+                        Phương thức thanh toán
+                    </h2>
+
+
+                    <!-- COD -->
+
+                    <label class="payment-option">
+
+                        <input type="radio"
+                               name="paymentMethod"
+                               value="COD"
+                               checked>
+
+                        <div>
+
+                            <strong>
+                                🚚 Thanh toán khi nhận hàng
+                            </strong>
+
+                            <p>
+                                Thanh toán tiền mặt cho nhân viên giao hàng.
+                            </p>
+
+                        </div>
+
+                    </label>
+
+
+                    <!-- WALLET -->
+
+                    <label class="payment-option wallet-disabled">
+
+                        <input type="radio"
+                               name="paymentMethod"
+                               value="WALLET">
+
+                        <div>
+
+                            <strong>
+                                💰 Ví Tinh Hoa Tây Bắc
+                            </strong>
+
+                            <p>
+                                Thanh toán trực tiếp bằng số dư trong ví.
+                            </p>
+
+                            <small>
+                                Sẽ hoạt động sau khi hoàn thiện hệ thống tài khoản.
+                            </small>
+
+                        </div>
+
+                    </label>
+
+
+                    <!-- QR -->
+
+                    <label class="payment-option">
+
+                        <input type="radio"
+                               name="paymentMethod"
+                               value="QR">
+
+                        <div>
+
+                            <strong>
+                                📱 Thanh toán bằng QR Code
+                            </strong>
+
+                            <p>
+                                Quét VietQR bằng ứng dụng ngân hàng.
+                            </p>
+
+                        </div>
+
+                    </label>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- RIGHT -->
+
+            <aside class="checkout-summary">
+
+
+                <h2>
+                    Đơn hàng của bạn
+                </h2>
+
+
+                <div class="checkout-products">
+
+
+                    <div class="checkout-product"
+                         th:each="item : ${cartItems}">
+
+
+                        <img th:src="${item.product.image}"
+                             th:alt="${item.product.name}">
+
+
+                        <div>
+
+                            <strong th:text="${item.product.name}">
+                                Sản phẩm
+                            </strong>
+
+                            <span>
+
+                                Số lượng:
+
+                                <b th:text="${item.quantity}">
+                                    1
+                                </b>
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="checkout-product-price"
+                             th:text="${#numbers.formatDecimal(
+                             item.subtotal,
+                             0,
+                             'POINT',
+                             0,
+                             'COMMA'
+                             ) + 'đ'}">
+
+                            0đ
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="checkout-summary-row">
+
+                    <span>
+                        Tạm tính
+                    </span>
+
+                    <strong th:text="${#numbers.formatDecimal(
+                    cartTotal,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    ) + 'đ'}">
+
+                        0đ
+
+                    </strong>
+
+                </div>
+
+
+                <div class="checkout-summary-row">
+
+                    <span>
+                        Phí giao hàng
+                    </span>
+
+                    <strong>
+                        Miễn phí
+                    </strong>
+
+                </div>
+
+
+                <div class="checkout-total">
+
+                    <span>
+                        Tổng thanh toán
+                    </span>
+
+                    <strong th:text="${#numbers.formatDecimal(
+                    cartTotal,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    ) + 'đ'}">
+
+                        0đ
+
+                    </strong>
+
+                </div>
+
+
+                <button type="submit"
+                        class="place-order-btn">
+
+                    ĐẶT HÀNG
+
+                </button>
+
+
+                <p class="checkout-security">
+
+                    🔒 Thông tin của bạn được bảo mật.
+
+                </p>
+
+
+            </aside>
+
+
+        </form>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+<script th:src="@{/js/main.js}"></script>
 
 </body>
 </html>

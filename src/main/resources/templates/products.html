@@ -1,10 +1,284 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sản phẩm | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+<!-- PAGE TITLE -->
+
+<section class="products-page-header">
+
+    <div class="container">
+
+        <p class="products-breadcrumb">
+
+            <a th:href="@{/}">
+                Trang chủ
+            </a>
+
+            /
+
+            <span>
+                Sản phẩm
+            </span>
+
+        </p>
+
+        <h1>
+
+            Đặc sản Tây Bắc
+
+        </h1>
+
+        <p>
+
+            Khám phá những sản phẩm mang đậm hương vị núi rừng.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- PRODUCTS CONTENT -->
+
+<section class="products-page">
+
+    <div class="container products-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="products-sidebar">
+
+
+            <div class="filter-box">
+
+                <h3>
+
+                    Danh mục sản phẩm
+
+                </h3>
+
+
+                <a th:href="@{/products}"
+                   class="filter-category">
+
+                    Tất cả sản phẩm
+
+                </a>
+
+
+                <a th:each="category : ${categories}"
+                   th:href="@{/products(categoryId=${category.id})}"
+                   th:text="${category.name}"
+                   class="filter-category">
+
+                    Danh mục
+
+                </a>
+
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- PRODUCT AREA -->
+
+        <main class="products-main">
+
+
+            <div class="products-toolbar">
+
+
+                <div>
+
+                    <h2>
+
+                        Tất cả sản phẩm
+
+                    </h2>
+
+                    <p>
+
+                        Tìm thấy
+
+                        <strong th:text="${#lists.size(products)}">
+                            0
+                        </strong>
+
+                        sản phẩm
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- PRODUCT GRID -->
+
+            <div class="product-grid"
+                 th:if="${products != null and !#lists.isEmpty(products)}">
+
+
+                <div class="product-card"
+                     th:each="product : ${products}">
+
+
+                    <div class="product-image">
+
+
+                        <span class="product-badge"
+                              th:if="${product.featured}">
+
+                            Nổi bật
+
+                        </span>
+
+
+                        <img th:src="${product.image}"
+                             th:alt="${product.name}">
+
+
+                        <a th:href="@{/products/{id}(id=${product.id})}"
+                           class="quick-add"
+                           title="Xem chi tiết">
+
+                            👁
+
+                        </a>
+
+
+                    </div>
+
+
+                    <div class="product-info">
+
+
+                        <span class="product-category"
+                              th:text="${product.category != null ? product.category.name : 'Đặc sản Tây Bắc'}">
+
+                            Danh mục
+
+                        </span>
+
+
+                        <h3>
+
+                            <a th:href="@{/products/{id}(id=${product.id})}"
+                               th:text="${product.name}">
+
+                                Tên sản phẩm
+
+                            </a>
+
+                        </h3>
+
+
+                        <div class="rating">
+
+                            ★★★★★
+
+                        </div>
+
+
+                        <div class="price"
+                             th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'COMMA') + 'đ'}">
+
+                            0đ
+
+                        </div>
+
+
+                        <div class="product-stock"
+                             th:if="${product.stock != null}">
+
+                            Còn
+
+                            <strong th:text="${product.stock}">
+                                0
+                            </strong>
+
+                            sản phẩm
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- EMPTY -->
+
+            <div class="empty-products"
+                 th:if="${products == null or #lists.isEmpty(products)}">
+
+                <div class="empty-products-icon">
+
+                    🛍
+
+                </div>
+
+                <h3>
+
+                    Không tìm thấy sản phẩm
+
+                </h3>
+
+                <p>
+
+                    Hãy thử từ khóa hoặc danh mục khác.
+
+                </p>
+
+            </div>
+
+
+        </main>
+
+
+    </div>
+
+</section>
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/main.js}"></script>
 </body>
+
 </html>

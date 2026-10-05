@@ -1,10 +1,246 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng nhập | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
+
 <body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+<section class="auth-v2-page">
+
+    <div class="auth-v2-decoration auth-v2-decoration-left"></div>
+    <div class="auth-v2-decoration auth-v2-decoration-right"></div>
+
+
+    <div class="auth-v2-card">
+
+
+        <div class="auth-v2-brand">
+
+            <div class="auth-v2-logo">
+                ⛰
+            </div>
+
+            <div class="auth-v2-brand-name">
+                TINH HOA
+            </div>
+
+            <div class="auth-v2-brand-sub">
+                TÂY BẮC
+            </div>
+
+        </div>
+
+
+        <div class="auth-v2-heading">
+
+            <span>
+                CHÀO MỪNG TRỞ LẠI
+            </span>
+
+            <h1>
+                Đăng nhập
+            </h1>
+
+            <p>
+                Đăng nhập để tiếp tục mua sắm và quản lý đơn hàng của bạn.
+            </p>
+
+        </div>
+
+
+        <div class="auth-v2-success"
+             th:if="${param.registered}">
+
+            ✓ Đăng ký thành công. Bạn có thể đăng nhập ngay.
+
+        </div>
+
+
+        <div class="auth-v2-error"
+             th:if="${param.error}">
+
+            Email hoặc mật khẩu không chính xác.
+
+        </div>
+
+
+        <div class="auth-v2-success"
+             th:if="${param.logout}">
+
+            ✓ Bạn đã đăng xuất thành công.
+
+        </div>
+
+
+        <form th:action="@{/login}"
+              method="post"
+              class="auth-v2-form">
+
+
+            <div class="auth-v2-field">
+
+                <label>
+                    Email
+                </label>
+
+                <div class="auth-v2-input">
+
+                    <div class="auth-v2-input-icon">
+                        ✉
+                    </div>
+
+                    <input type="email"
+                           name="email"
+                           required
+                           autocomplete="email"
+                           placeholder="example@gmail.com">
+
+                </div>
+
+            </div>
+
+
+            <div class="auth-v2-field">
+
+                <label>
+                    Mật khẩu
+                </label>
+
+                <div class="auth-v2-input">
+
+                    <div class="auth-v2-input-icon">
+                        🔒
+                    </div>
+
+                    <input type="password"
+                           name="password"
+                           id="loginPassword"
+                           required
+                           autocomplete="current-password"
+                           placeholder="Nhập mật khẩu">
+
+                    <button type="button"
+                            class="auth-v2-eye"
+                            onclick="togglePassword()">
+
+                        👁
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="auth-v2-row">
+
+                <label class="auth-v2-remember">
+
+                    <input type="checkbox">
+
+                    <span>
+                        Ghi nhớ đăng nhập
+                    </span>
+
+                </label>
+
+
+                <a href="#"
+                   class="auth-v2-forgot">
+
+                    Quên mật khẩu?
+
+                </a>
+
+            </div>
+
+
+            <button type="submit"
+                    class="auth-v2-submit">
+
+                <span>
+                    Đăng nhập
+                </span>
+
+                <strong>
+                    →
+                </strong>
+
+            </button>
+
+
+        </form>
+
+
+        <div class="auth-v2-divider">
+
+            <span>
+                hoặc
+            </span>
+
+        </div>
+
+
+        <div class="auth-v2-register">
+
+            <span>
+                Bạn chưa có tài khoản?
+            </span>
+
+            <a th:href="@{/register}">
+                Đăng ký ngay
+            </a>
+
+        </div>
+
+
+        <a th:href="@{/}"
+           class="auth-v2-home">
+
+            ← Quay lại trang chủ
+
+        </a>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<script>
+
+    function togglePassword() {
+
+        const input =
+            document.getElementById("loginPassword");
+
+        if (input.type === "password") {
+            input.type = "text";
+        } else {
+            input.type = "password";
+        }
+
+    }
+
+</script>
+
 
 </body>
 </html>

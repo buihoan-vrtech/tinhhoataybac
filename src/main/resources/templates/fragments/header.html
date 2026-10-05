@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+<header class="header"
+        th:fragment="header">
+
+
+    <!-- TOP BAR -->
+
+    <div class="top-bar">
+
+        <div class="container top-bar-content">
+
+
+            <div>
+                Đặc sản Tây Bắc chính gốc - Giao hàng toàn quốc
+            </div>
+
+
+            <div class="top-links">
+
+                <a href="#">
+                    Theo dõi đơn hàng
+                </a>
+
+                <a href="#">
+                    Hỗ trợ
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MAIN HEADER -->
+
+    <div class="main-header">
+
+        <div class="container header-content">
+
+
+            <!-- LOGO -->
+
+            <a th:href="@{/}"
+               class="logo">
+
+
+                <div class="logo-icon">
+                    ⛰
+                </div>
+
+
+                <div class="logo-text">
+
+                    <strong>
+                        TINH HOA
+                    </strong>
+
+                    <span>
+                        TÂY BẮC
+                    </span>
+
+                </div>
+
+
+            </a>
+
+
+
+            <!-- SEARCH -->
+
+            <form class="search-box"
+                  th:action="@{/products}"
+                  method="get">
+
+
+                <input type="text"
+                       name="keyword"
+                       placeholder="Tìm kiếm đặc sản...">
+
+
+                <button type="submit">
+                    🔍
+                </button>
+
+
+            </form>
+
+
+
+            <!-- ACTION -->
+
+            <div class="header-actions">
+
+
+                <!-- CHƯA LOGIN -->
+
+                <a th:if="${!loggedIn}"
+                   th:href="@{/login}"
+                   class="action-item">
+
+
+                    <span class="action-icon">
+                        👤
+                    </span>
+
+
+                    <div>
+
+                        <small>
+                            Tài khoản
+                        </small>
+
+                        <strong>
+                            Đăng nhập
+                        </strong>
+
+                    </div>
+
+
+                </a>
+
+
+
+                <!-- ĐÃ LOGIN -->
+
+                <div th:if="${loggedIn}"
+                     class="user-header-area">
+
+
+                    <a th:href="@{/account}"
+                       class="action-item">
+
+
+                        <span class="action-icon">
+                            👤
+                        </span>
+
+
+                        <div>
+
+                            <small>
+                                Xin chào
+                            </small>
+
+                            <strong th:text="${currentUser != null
+                            ? currentUser.fullName
+                            : 'Tài khoản'}">
+
+                                Người dùng
+
+                            </strong>
+
+                        </div>
+
+
+                    </a>
+
+
+
+                    <form th:action="@{/logout}"
+                          method="post"
+                          class="header-logout-form">
+
+
+                        <button type="submit"
+                                class="header-logout-btn">
+
+                            Đăng xuất
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+
+                <!-- ADMIN -->
+
+                <a th:if="${isAdmin}"
+                   th:href="@{/admin}"
+                   class="action-item">
+
+                    <span class="action-icon">
+                        ⚙
+                    </span>
+
+                    <div>
+
+                        <small>
+                            Quản trị
+                        </small>
+
+                        <strong>
+                            Admin
+                        </strong>
+
+                    </div>
+
+                </a>
+
+
+
+                <!-- CART -->
+
+                <a th:href="@{/cart}"
+                   class="action-item cart-action">
+
+
+                    <span class="action-icon">
+                        🛒
+                    </span>
+
+
+                    <div>
+
+                        <small>
+                            Giỏ hàng
+                        </small>
+
+                        <strong>
+
+                            <span th:text="${cartCount}">
+                                0
+                            </span>
+
+                            sản phẩm
+
+                        </strong>
+
+                    </div>
+
+
+                    <span class="cart-count"
+                          th:text="${cartCount}">
+                        0
+                    </span>
+
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- NAV -->
+
+    <nav class="navbar">
+
+        <div class="container nav-content">
+
+
+            <a th:href="@{/}"
+               class="nav-link">
+
+                Trang chủ
+
+            </a>
+
+
+            <a th:href="@{/products}"
+               class="nav-link">
+
+                Sản phẩm
+
+            </a>
+
+
+            <a th:href="@{/products(categoryId=1)}"
+               class="nav-link">
+
+                Thịt gác bếp
+
+            </a>
+
+
+            <a th:href="@{/products(categoryId=2)}"
+               class="nav-link">
+
+                Gia vị Tây Bắc
+
+            </a>
+
+
+            <a th:href="@{/products(categoryId=3)}"
+               class="nav-link">
+
+                Mật ong
+
+            </a>
+
+
+            <a th:href="@{/products(categoryId=4)}"
+               class="nav-link">
+
+                Chè Tây Bắc
+
+            </a>
+
+
+        </div>
+
+    </nav>
+
+
+</header>
+
+
+</body>
+
+</html>

@@ -1,4 +1,7 @@
 package vn.edu.crs.tinhhoataybac.repository;
 
-public class CategoryRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import vn.edu.crs.tinhhoataybac.model.Category;
+
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 }

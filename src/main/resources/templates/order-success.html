@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Đặt hàng thành công | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="order-success-page">
+
+    <div class="container">
+
+
+        <div class="order-success-box">
+
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+
+            <h1>
+                Đặt hàng thành công!
+            </h1>
+
+
+            <p>
+                Cảm ơn bạn đã mua hàng tại
+                <strong>Tinh Hoa Tây Bắc</strong>.
+            </p>
+
+
+            <div class="success-order-code">
+
+                Mã đơn hàng:
+
+                <strong th:text="'#' + ${order.id}">
+                    #1
+                </strong>
+
+            </div>
+
+
+            <div class="success-details">
+
+
+                <div>
+
+                    <span>
+                        Khách hàng
+                    </span>
+
+                    <strong th:text="${order.customerName}">
+                        Nguyễn Văn A
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Số điện thoại
+                    </span>
+
+                    <strong th:text="${order.phone}">
+                        0123456789
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Phương thức
+                    </span>
+
+                    <strong th:text="${order.paymentMethod}">
+                        COD
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Trạng thái thanh toán
+                    </span>
+
+                    <strong th:text="${order.paymentStatus}">
+                        UNPAID
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Trạng thái đơn
+                    </span>
+
+                    <strong th:text="${order.orderStatus}">
+                        PENDING
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Tổng tiền
+                    </span>
+
+                    <strong th:text="${#numbers.formatDecimal(
+                    order.totalAmount,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    ) + 'đ'}">
+
+                        0đ
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="success-actions">
+
+
+                <a th:href="@{/products}"
+                   class="success-primary-btn">
+
+                    Tiếp tục mua hàng
+
+                </a>
+
+
+                <a th:href="@{/}"
+                   class="success-secondary-btn">
+
+                    Về trang chủ
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
+</html>
