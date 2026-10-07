@@ -21,7 +21,7 @@ public class OrderDetail {
     private Product product;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private Double quantity;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal unitPrice;
@@ -56,11 +56,11 @@ public class OrderDetail {
         this.product = product;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

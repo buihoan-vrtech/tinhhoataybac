@@ -16,9 +16,10 @@
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
-</head>
+<link rel="stylesheet" href="/css/features.css"></head>
 
 <body>
+<div class="feature-main"><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
 
 
 <!-- HEADER -->
@@ -124,7 +125,7 @@
 
             <div class="detail-price"
                  th:text="${#numbers.formatDecimal(
-                 product.price,
+                 product.effectivePrice,
                  0,
                  'POINT',
                  0,
@@ -223,9 +224,8 @@
 
                         <input id="quantity"
                                type="number"
-                               name="quantity"
-                               value="1"
-                               min="1"
+                               name="quantity" th:step="${product.orderQuantityStep}" th:value="${product.minimumOrderQuantity}" th:min="${product.minimumOrderQuantity}"
+                               
                                th:attr="max=${product.stock}">
 
 
@@ -335,5 +335,5 @@
 
 <script th:src="@{/js/main.js}"></script>
 
-</body>
+<div class="feature-main"><section class="feature-card"><h2>Thư viện ảnh</h2><img th:each="i:${gallery}" th:src="${i.url}" th:alt="${product.name}" style="width:150px;height:150px;object-fit:cover;margin:8px;border-radius:12px"></section><section class="feature-card"><h2 th:text="${'Đánh giá · ' + #numbers.formatDecimal(ratingAverage,1,1) + '/5'}"></h2><div th:each="r:${reviews}"><strong th:text="${r.user.fullName + ' · ' + r.rating + '/5'}"></strong><p th:text="${r.comment}"></p></div><form th:if="${loggedIn}" class="feature-form" th:action="@{/products/{id}/reviews(id=${product.id})}" method="post"><label>Số sao<select name="rating"><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select></label><label>Nội dung<textarea name="comment" maxlength="2000"></textarea></label><button>Gửi đánh giá</button></form><p>Khách đã nhận sản phẩm có thể gửi đánh giá.</p></section></div></body>
 </html>

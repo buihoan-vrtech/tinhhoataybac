@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Tài khoản | Tinh Hoa Tây Bắc
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+<link rel="stylesheet" href="/css/features.css"></head>
+
+<body>
+<div class="feature-main"><nav class="feature-nav"><a href="/account/profile">Hồ sơ</a><a href="/account/addresses">Địa chỉ</a><a href="/account/orders">Đơn hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="account-page">
+
+    <div class="container">
+
+
+        <div class="account-heading">
+
+            <span>
+                TÀI KHOẢN CỦA TÔI
+            </span>
+
+            <h1>
+
+                Xin chào,
+
+                <span th:text="${user.fullName}">
+                    Người dùng
+                </span>
+
+            </h1>
+
+            <p>
+                Quản lý thông tin cá nhân,
+                đơn hàng và ví của bạn.
+            </p>
+
+        </div>
+
+
+
+        <div class="account-layout">
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="account-sidebar">
+
+
+                <div class="account-user-box">
+
+
+                    <div class="account-avatar">
+
+                        <span th:text="${#strings.substring(user.fullName,0,1)}">
+                            U
+                        </span>
+
+                    </div>
+
+
+                    <strong th:text="${user.fullName}">
+                        Người dùng
+                    </strong>
+
+
+                    <small th:text="${user.email}">
+                        email@gmail.com
+                    </small>
+
+
+                </div>
+
+
+
+                <nav class="account-menu">
+
+
+                    <a th:href="@{/account}"
+                       class="active">
+
+                        👤 Thông tin tài khoản
+
+                    </a>
+
+
+                    <a th:href="@{/account/orders}">
+
+                        📦 Đơn hàng của tôi
+
+                    </a>
+
+
+                    <a th:href="@{/wallet}">
+
+                        💳 Ví Tinh Hoa
+
+                    </a>
+
+
+                </nav>
+
+
+            </aside>
+
+
+
+            <!-- CONTENT -->
+
+            <main class="account-content">
+
+
+                <!-- THÔNG TIN -->
+
+                <div class="account-card">
+
+
+                    <h2>
+                        Thông tin cá nhân
+                    </h2>
+
+
+                    <div class="account-info-grid">
+
+
+                        <div>
+
+                            <span>
+                                Họ và tên
+                            </span>
+
+                            <strong th:text="${user.fullName}">
+                                Nguyễn Văn A
+                            </strong>
+
+                        </div>
+
+
+
+                        <div>
+
+                            <span>
+                                Email
+                            </span>
+
+                            <strong th:text="${user.email}">
+                                example@gmail.com
+                            </strong>
+
+                        </div>
+
+
+
+                        <div>
+
+                            <span>
+                                Số điện thoại
+                            </span>
+
+                            <strong th:text="${user.phone != null && !user.phone.isBlank()
+                            ? user.phone
+                            : 'Chưa cập nhật'}">
+
+                                Chưa cập nhật
+
+                            </strong>
+
+                        </div>
+
+
+
+                        <div>
+
+                            <span>
+                                Vai trò
+                            </span>
+
+                            <strong th:text="${user.role}">
+                                USER
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- VÍ -->
+
+                <div class="account-wallet-card">
+
+
+                    <div>
+
+                        <small>
+                            SỐ DƯ VÍ TINH HOA
+                        </small>
+
+
+                        <h2>
+
+                            <span th:text="${#numbers.formatDecimal(
+                            wallet.balance,
+                            0,
+                            'COMMA',
+                            0,
+                            'POINT')}">
+
+                                0
+
+                            </span>
+
+                            ₫
+
+                        </h2>
+
+
+                        <p>
+                            Sử dụng ví để thanh toán
+                            đơn hàng nhanh chóng.
+                        </p>
+
+                    </div>
+
+
+                    <a th:href="@{/wallet}"
+                       class="account-wallet-button">
+
+                        Mở ví →
+
+                    </a>
+
+
+                </div>
+
+
+
+                <!-- ĐƠN GẦN ĐÂY -->
+
+                <div class="account-card">
+
+
+                    <div class="account-recent-heading">
+
+                        <h2>
+                            Đơn hàng gần đây
+                        </h2>
+
+
+                        <a th:href="@{/account/orders}">
+
+                            Xem tất cả →
+
+                        </a>
+
+                    </div>
+
+
+
+                    <div th:if="${recentOrders == null || recentOrders.isEmpty()}"
+                         class="account-no-orders">
+
+                        Bạn chưa có đơn hàng nào.
+
+                    </div>
+
+
+
+                    <div th:if="${recentOrders != null && !recentOrders.isEmpty()}"
+                         class="account-recent-orders">
+
+
+                        <a th:each="order : ${recentOrders}"
+                           th:href="@{/account/orders/{id}(id=${order.id})}"
+                           class="account-recent-order">
+
+
+                            <div>
+
+                                <strong th:text="'Đơn #' + ${order.id}">
+                                    Đơn #1
+                                </strong>
+
+
+                                <small th:if="${order.createdAt != null}"
+                                       th:text="${#temporals.format(
+                                       order.createdAt,
+                                       'dd/MM/yyyy HH:mm')}">
+
+                                    01/01/2026
+
+                                </small>
+
+                            </div>
+
+
+
+                            <div>
+
+                                <span th:text="${order.paymentStatusLabel}">
+                                    PAID
+                                </span>
+
+
+                                <strong>
+
+                                    <span th:text="${#numbers.formatDecimal(
+                                    order.totalAmount,
+                                    0,
+                                    'COMMA',
+                                    0,
+                                    'POINT')}">
+
+                                        0
+
+                                    </span>
+
+                                    ₫
+
+                                </strong>
+
+                            </div>
+
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </main>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
+</html>

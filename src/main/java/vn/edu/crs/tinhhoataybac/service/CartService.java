@@ -34,16 +34,17 @@ public class CartService {
 
     public void addToCart(HttpSession session,
                           Product product,
-                          int quantity) {
+                          double quantity) {
 
+        product.validateQuantity(quantity);
         List<CartItem> cart = getCart(session);
-
+        if(product.getStock()==null||product.getStock()<=0||quantity<=0)throw new IllegalStateException("Sản phẩm đã hết hàng.");
         for (CartItem item : cart) {
 
             if (item.getProduct().getId().equals(product.getId())) {
 
                 item.setQuantity(
-                        item.getQuantity() + quantity
+                        Math.min(product.getStock(), Math.round((item.getQuantity() + quantity)*100.0)/100.0)
                 );
 
                 session.setAttribute(CART_SESSION_KEY, cart);
@@ -68,7 +69,7 @@ public class CartService {
 
     public void updateQuantity(HttpSession session,
                                Long productId,
-                               int quantity) {
+                               double quantity) {
 
         List<CartItem> cart = getCart(session);
 
@@ -144,12 +145,7 @@ public class CartService {
 
         List<CartItem> cart = getCart(session);
 
-        int totalQuantity = 0;
-
-        for (CartItem item : cart) {
-
-            totalQuantity += item.getQuantity();
-        }
+        int totalQuantity = cart.size();
 
         return totalQuantity;
     }

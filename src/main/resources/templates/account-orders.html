@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Đơn hàng của tôi | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+<section class="account-page">
+
+    <div class="container">
+
+        <div class="account-heading">
+
+            <span>TÀI KHOẢN CỦA TÔI</span>
+
+            <h1>Đơn hàng của tôi</h1>
+
+            <p>
+                Theo dõi lịch sử mua hàng và trạng thái đơn.
+            </p>
+
+        </div>
+
+
+        <div class="account-layout">
+
+
+            <aside class="account-sidebar">
+
+                <div class="account-user-box">
+
+                    <div class="account-avatar">
+
+                        <span th:text="${#strings.substring(user.fullName,0,1)}">
+                            U
+                        </span>
+
+                    </div>
+
+                    <strong th:text="${user.fullName}">
+                        Người dùng
+                    </strong>
+
+                    <small th:text="${user.email}">
+                        email@gmail.com
+                    </small>
+
+                </div>
+
+
+                <nav class="account-menu">
+
+                    <a th:href="@{/account}">
+                        👤 Thông tin tài khoản
+                    </a>
+
+                    <a th:href="@{/account/orders}"
+                       class="active">
+                        📦 Đơn hàng của tôi
+                    </a>
+
+                    <a th:href="@{/wallet}">
+                        💳 Ví Tinh Hoa
+                    </a>
+
+                </nav>
+
+            </aside>
+
+
+            <main class="account-content">
+
+                <div class="orders-card">
+
+
+                    <div class="orders-card-heading">
+
+                        <div>
+
+                            <h2>Lịch sử đơn hàng</h2>
+
+                            <p th:if="${orders != null}">
+
+                                Bạn có
+
+                                <strong th:text="${orders.size()}">
+                                    0
+                                </strong>
+
+                                đơn hàng
+
+                            </p>
+
+                        </div>
+
+
+                        <a th:href="@{/products}"
+                           class="orders-buy-more">
+
+                            + Mua thêm sản phẩm
+
+                        </a>
+
+                    </div>
+
+
+                    <div th:if="${orders == null || orders.isEmpty()}"
+                         class="orders-empty">
+
+                        <div class="orders-empty-icon">
+                            📦
+                        </div>
+
+                        <h3>
+                            Bạn chưa có đơn hàng nào
+                        </h3>
+
+                        <p>
+                            Đơn hàng sau khi đặt sẽ xuất hiện tại đây.
+                        </p>
+
+                        <a th:href="@{/products}"
+                           class="btn-primary">
+                            Mua sắm ngay
+                        </a>
+
+                    </div>
+
+
+                    <div th:if="${orders != null && !orders.isEmpty()}"
+                         class="orders-list">
+
+
+                        <article th:each="order : ${orders}"
+                                 class="order-history-item">
+
+
+                            <div class="order-history-top">
+
+                                <div>
+
+                                    <span class="order-history-code">
+
+                                        Đơn hàng
+
+                                        <strong th:text="'#' + ${order.id}">
+                                            #1
+                                        </strong>
+
+                                    </span>
+
+                                    <small th:if="${order.createdAt != null}"
+                                           th:text="${#temporals.format(
+                                           order.createdAt,
+                                           'dd/MM/yyyy HH:mm'
+                                           )}">
+                                        01/01/2026
+                                    </small>
+
+                                </div>
+
+
+                                <div class="order-history-status">
+
+                                    <span class="payment-status"
+                                          th:classappend="${order.paymentStatus == 'PAID'}
+                                          ? ' paid'
+                                          : ' pending'"
+                                          th:text="${order.paymentStatusLabel}">
+                                        PAID
+                                    </span>
+
+                                    <span class="order-status"
+                                          th:text="${order.orderStatusLabel}">
+                                        CONFIRMED
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="order-history-body">
+
+                                <div class="order-history-info">
+
+                                    <div>
+
+                                        <span>Phương thức</span>
+
+                                        <strong th:text="${order.paymentMethodLabel}">
+                                            QR
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>Người nhận</span>
+
+                                        <strong th:text="${order.customerName}">
+                                            Nguyễn Văn A
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>Mã thanh toán</span>
+
+                                        <strong th:text="${order.paymentCode}">
+                                            THB1
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="order-history-total">
+
+                                    <span>Tổng tiền</span>
+
+                                    <strong>
+
+                                        <span th:text="${#numbers.formatDecimal(
+                                        order.totalAmount,
+                                        0,
+                                        'COMMA',
+                                        0,
+                                        'POINT'
+                                        )}">
+                                            0
+                                        </span>
+
+                                        ₫
+
+                                    </strong>
+
+
+                                    <a th:href="@{/account/orders/{id}(id=${order.id})}">
+                                        Xem chi tiết →
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

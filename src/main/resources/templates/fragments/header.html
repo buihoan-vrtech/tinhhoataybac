@@ -24,11 +24,11 @@
 
             <div class="top-links">
 
-                <a href="#">
+                <a href="/account/orders">
                     Theo dõi đơn hàng
                 </a>
 
-                <a href="#">
+                <a href="/chinh-sach-doi-tra">
                     Hỗ trợ
                 </a>
 
@@ -85,7 +85,7 @@
 
                 <input type="text"
                        name="keyword"
-                       placeholder="Tìm kiếm đặc sản...">
+                       placeholder="Tìm kiếm đặc sản..." id="product-search" list="product-suggestions">
 
 
                 <button type="submit">
@@ -97,7 +97,8 @@
 
 
 
-            <!-- ACTION -->
+            <datalist id="product-suggestions"></datalist><script>(()=>{const input=document.getElementById('product-search'),list=document.getElementById('product-suggestions');if(!input||!list)return;let timer;input.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(async()=>{if(input.value.trim().length<2){list.replaceChildren();return;}try{const r=await fetch('/products-search-suggestions?keyword='+encodeURIComponent(input.value));const items=await r.json();list.replaceChildren(...items.map(p=>{const o=document.createElement('option');o.value=p.name;return o}));}catch(e){list.replaceChildren();}},250);});})();</script>
+<!-- ACTION -->
 
             <div class="header-actions">
 
@@ -213,7 +214,8 @@
 
 
 
-                <!-- CART -->
+                <a th:if="${loggedIn}" href="/account/notifications" class="action-item">🔔 Thông báo</a>
+<!-- CART -->
 
                 <a th:href="@{/cart}"
                    class="action-item cart-action">

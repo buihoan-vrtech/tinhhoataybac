@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Thanh toán SePay | Tinh Hoa Tây Bắc
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+
+<body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="qr-payment-page">
+
+    <div class="container">
+
+
+        <div class="payment-success-box">
+
+
+            <h1>
+                Thanh toán đơn hàng
+            </h1>
+
+
+            <p>
+                Bạn sẽ được chuyển tới
+                SePay Sandbox để quét QR.
+            </p>
+
+
+            <div class="success-details">
+
+
+                <div>
+
+                    <span>
+                        Mã thanh toán
+                    </span>
+
+                    <strong th:text="${order.paymentCode}">
+                        THB1
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Tổng tiền
+                    </span>
+
+                    <strong>
+
+                        <span th:text="${#numbers.formatDecimal(
+                        order.totalAmount,
+                        0,
+                        'COMMA',
+                        0,
+                        'POINT')}">
+
+                            0
+
+                        </span>
+
+                        ₫
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <form th:action="${checkoutUrl}"
+                  method="post">
+
+
+                <input th:each="field : ${sepayFields}"
+                       type="hidden"
+                       th:name="${field.key}"
+                       th:value="${field.value}">
+
+
+                <button type="submit"
+                        class="checkout-btn">
+
+                    Thanh toán bằng QR SePay →
+
+                </button>
+
+
+            </form>
+
+
+            <p style="
+                margin-top:18px;
+                color:#888;
+                font-size:12px;
+            ">
+
+                Sandbox không sử dụng tiền thật.
+
+            </p>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
+
+</html>

@@ -1,176 +1,110 @@
 package vn.edu.crs.tinhhoataybac.controller;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.crs.tinhhoataybac.model.Order;
-import vn.edu.crs.tinhhoataybac.service.CartService;
-import vn.edu.crs.tinhhoataybac.service.OrderService;
+import vn.edu.crs.tinhhoataybac.model.*;
+import vn.edu.crs.tinhhoataybac.repository.*;
+import vn.edu.crs.tinhhoataybac.service.*;
 
 @Controller
 public class CheckoutController {
+  private final CartService cart;
+  private final CommerceService commerce;
+  private final UserService users;
+  private final WalletService wallets;
+  private final OrderRepository orders;
+  private final UserAddressRepository addresses;
 
-    private final CartService cartService;
-    private final OrderService orderService;
+  public CheckoutController(
+      CartService cart,
+      CommerceService commerce,
+      UserService users,
+      WalletService wallets,
+      OrderRepository orders,
+      UserAddressRepository addresses) {
+    this.cart = cart;
+    this.commerce = commerce;
+    this.users = users;
+    this.wallets = wallets;
+    this.orders = orders;
+    this.addresses = addresses;
+  }
 
-    public CheckoutController(CartService cartService,
-                              OrderService orderService) {
+  private void fill(Model m, HttpSession s, User u) {
+    m.addAttribute("cartItems", cart.getCart(s));
+    m.addAttribute("cartTotal", cart.getTotal(s));
+    m.addAttribute("user", u);
+    m.addAttribute("walletBalance", wallets.getBalance(u));
+    m.addAttribute("addresses", addresses.findByUserIdOrderByDefaultAddressDescIdDesc(u.getId()));
+  }
 
-        this.cartService = cartService;
-        this.orderService = orderService;
+  @GetMapping("/checkout")
+  public String checkout(Model m, HttpSession s, Authentication a) {
+    if (cart.getCart(s).isEmpty()) return "redirect:/cart";
+    fill(m, s, users.findByEmail(a.getName()));
+    return "checkout";
+  }
+
+  @PostMapping("/checkout/place-order")
+  public String placeOrder(
+      @RequestParam String customerName,
+      @RequestParam String phone,
+      @RequestParam(required = false) String email,
+      @RequestParam String address,
+      @RequestParam(required = false) String note,
+      @RequestParam String paymentMethod,
+      @RequestParam(defaultValue = "standard") String shippingMethod,
+      @RequestParam(required = false) String voucherCode,
+      HttpSession s,
+      Model m,
+      Authentication a) {
+    User u = users.findByEmail(a.getName());
+    try {
+      Order o =
+          commerce.checkout(
+              u,
+              customerName,
+              phone,
+              address,
+              note,
+              paymentMethod,
+              cart.getCart(s),
+              shippingMethod,
+              voucherCode);
+      cart.clearCart(s);
+      return "redirect:"
+          + ("QR".equals(paymentMethod) ? "/payment/qr/" : "/order-success/")
+          + o.getId();
+    } catch (IllegalStateException | IllegalArgumentException e) {
+      fill(m, s, u);
+      m.addAttribute("error", e.getMessage());
+      return "checkout";
     }
+  }
 
-    @GetMapping("/checkout")
-    public String checkout(Model model,
-                           HttpSession session) {
+  @GetMapping("/order-success/{id}")
+  public String success(@PathVariable Long id, Authentication a, Model m) {
+    Order o = orders.findById(id).orElse(null);
+    if (!commerce.owns(o, users.findByEmail(a.getName()))) return "redirect:/account/orders";
+    m.addAttribute("order", o);
+    return "order-success";
+  }
 
-        if (cartService.getCart(session).isEmpty()) {
-
-            return "redirect:/cart";
-        }
-
-        model.addAttribute(
-                "cartItems",
-                cartService.getCart(session)
-        );
-
-        model.addAttribute(
-                "cartTotal",
-                cartService.getTotal(session)
-        );
-
-        return "checkout";
+  @PostMapping("/checkout/quote")
+  @ResponseBody
+  public org.springframework.http.ResponseEntity<?> quote(
+      @RequestParam(defaultValue = "standard") String shippingMethod,
+      @RequestParam(required = false) String voucherCode,
+      HttpSession session) {
+    try {
+      return org.springframework.http.ResponseEntity.ok(
+          commerce.quote(cart.getCart(session), shippingMethod, voucherCode));
+    } catch (IllegalStateException e) {
+      return org.springframework.http.ResponseEntity.badRequest()
+          .body(java.util.Map.of("error", e.getMessage()));
     }
-
-    @PostMapping("/checkout/place-order")
-    public String placeOrder(
-            @RequestParam String customerName,
-            @RequestParam String phone,
-            @RequestParam(required = false) String email,
-            @RequestParam String address,
-            @RequestParam(required = false) String note,
-            @RequestParam String paymentMethod,
-            HttpSession session,
-            Model model) {
-
-        try {
-
-            if (customerName == null
-                    || customerName.trim().isEmpty()) {
-
-                throw new IllegalStateException(
-                        "Vui lòng nhập họ tên."
-                );
-            }
-
-            if (phone == null
-                    || phone.trim().isEmpty()) {
-
-                throw new IllegalStateException(
-                        "Vui lòng nhập số điện thoại."
-                );
-            }
-
-            if (address == null
-                    || address.trim().isEmpty()) {
-
-                throw new IllegalStateException(
-                        "Vui lòng nhập địa chỉ nhận hàng."
-                );
-            }
-
-            if (!paymentMethod.equals("COD")
-                    && !paymentMethod.equals("QR")
-                    && !paymentMethod.equals("WALLET")) {
-
-                throw new IllegalStateException(
-                        "Phương thức thanh toán không hợp lệ."
-                );
-            }
-
-            if (paymentMethod.equals("WALLET")) {
-
-                model.addAttribute(
-                        "error",
-                        "Thanh toán bằng Ví sẽ được kích hoạt "
-                                + "sau khi hoàn thiện tài khoản đăng nhập."
-                );
-
-                model.addAttribute(
-                        "cartItems",
-                        cartService.getCart(session)
-                );
-
-                model.addAttribute(
-                        "cartTotal",
-                        cartService.getTotal(session)
-                );
-
-                return "checkout";
-            }
-
-            Order order =
-                    orderService.createOrder(
-                            customerName.trim(),
-                            phone.trim(),
-                            email,
-                            address.trim(),
-                            note,
-                            paymentMethod,
-                            cartService.getCart(session)
-                    );
-
-            cartService.clearCart(session);
-
-            if ("QR".equals(paymentMethod)) {
-
-                return "redirect:/payment/qr/"
-                        + order.getId();
-            }
-
-            return "redirect:/order-success/"
-                    + order.getId();
-
-        } catch (Exception e) {
-
-            model.addAttribute(
-                    "error",
-                    e.getMessage()
-            );
-
-            model.addAttribute(
-                    "cartItems",
-                    cartService.getCart(session)
-            );
-
-            model.addAttribute(
-                    "cartTotal",
-                    cartService.getTotal(session)
-            );
-
-            return "checkout";
-        }
-    }
-
-    @GetMapping("/order-success/{id}")
-    public String orderSuccess(
-            @PathVariable Long id,
-            Model model) {
-
-        Order order =
-                orderService.getOrderById(id);
-
-        if (order == null) {
-
-            return "redirect:/";
-        }
-
-        model.addAttribute(
-                "order",
-                order
-        );
-
-        return "order-success";
-    }
+  }
 }

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Đang xác nhận thanh toán
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+
+<body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="qr-payment-page">
+
+    <div class="container">
+
+
+        <div class="payment-success-box"
+             id="waitingBox">
+
+
+            <div class="payment-spinner"
+                 style="margin:0 auto 25px;">
+            </div>
+
+
+            <h1>
+                Đang xác nhận thanh toán
+            </h1>
+
+
+            <p>
+                SePay đang kiểm tra giao dịch của bạn.
+            </p>
+
+
+            <div class="payment-success-code">
+
+                Mã thanh toán:
+
+                <strong th:text="${order.paymentCode}">
+                    THB1
+                </strong>
+
+            </div>
+
+
+            <p class="payment-redirect-text">
+
+                Không cần tải lại trang.
+                Hệ thống sẽ tự cập nhật.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="payment-success-box"
+             id="successBox"
+             style="display:none;">
+
+
+            <div class="payment-success-icon">
+
+                ✓
+
+            </div>
+
+
+            <h1>
+                Thanh toán thành công
+            </h1>
+
+
+            <p>
+                Đơn hàng đã được xác nhận.
+            </p>
+
+
+            <p class="payment-redirect-text">
+
+                Đang chuyển tới trang hoàn tất đơn hàng...
+
+            </p>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+<script th:inline="javascript">
+
+    const orderId =
+        /*[[${order.id}]]*/ 0;
+
+
+    let timer = null;
+
+
+    async function checkPayment() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/payment/status/"
+                    + orderId,
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (data.paid === true) {
+
+                clearInterval(timer);
+
+
+                document
+                    .getElementById("waitingBox")
+                    .style.display = "none";
+
+
+                document
+                    .getElementById("successBox")
+                    .style.display = "block";
+
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "/order-success/"
+                            + orderId;
+
+                    },
+                    1800
+                );
+            }
+
+        } catch (e) {
+
+            console.log(e);
+        }
+    }
+
+
+    checkPayment();
+
+
+    timer =
+        setInterval(
+            checkPayment,
+            2000
+        );
+
+</script>
+
+
+</body>
+
+</html>

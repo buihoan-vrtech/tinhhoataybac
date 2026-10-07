@@ -9,12 +9,15 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Thanh toán QR | Tinh Hoa Tây Bắc</title>
+    <title>
+        Thanh toán QR | Tinh Hoa Tây Bắc
+    </title>
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
 </head>
+
 
 <body>
 
@@ -23,22 +26,27 @@
 </div>
 
 
+
 <section class="qr-payment-page">
 
     <div class="container">
 
 
-        <div class="qr-payment-box">
+        <div class="qr-payment-box"
+             id="paymentWaiting">
 
 
             <div class="qr-left">
 
+
                 <h1>
-                    Thanh toán bằng QR
+                    Quét mã để thanh toán
                 </h1>
 
+
                 <p>
-                    Sử dụng ứng dụng ngân hàng để quét mã bên dưới.
+                    Mở ứng dụng ngân hàng
+                    và quét mã QR bên dưới.
                 </p>
 
 
@@ -55,8 +63,9 @@
 
 
                 <h2>
-                    Thông tin đơn hàng
+                    Thông tin thanh toán
                 </h2>
+
 
 
                 <div class="qr-info-row">
@@ -65,11 +74,12 @@
                         Mã đơn hàng
                     </span>
 
-                    <strong th:text="'#' + ${order.id}">
-                        #1
+                    <strong th:text="${order.id}">
+                        1
                     </strong>
 
                 </div>
+
 
 
                 <div class="qr-info-row">
@@ -85,44 +95,6 @@
                 </div>
 
 
-                <div class="qr-info-row">
-
-                    <span>
-                        Ngân hàng
-                    </span>
-
-                    <strong th:text="${bankId}">
-                        BANK
-                    </strong>
-
-                </div>
-
-
-                <div class="qr-info-row">
-
-                    <span>
-                        Số tài khoản
-                    </span>
-
-                    <strong th:text="${accountNo}">
-                        000000
-                    </strong>
-
-                </div>
-
-
-                <div class="qr-info-row">
-
-                    <span>
-                        Chủ tài khoản
-                    </span>
-
-                    <strong th:text="${accountName}">
-                        ACCOUNT NAME
-                    </strong>
-
-                </div>
-
 
                 <div class="qr-total">
 
@@ -130,62 +102,96 @@
                         Số tiền
                     </span>
 
-                    <strong th:text="${#numbers.formatDecimal(
-                    order.totalAmount,
-                    0,
-                    'POINT',
-                    0,
-                    'COMMA'
-                    ) + 'đ'}">
+                    <strong>
 
-                        0đ
+                        <span th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')}">
+                            0
+                        </span>
+
+                        ₫
 
                     </strong>
 
                 </div>
+
 
 
                 <div class="qr-warning">
 
-                    <strong>
-                        Lưu ý
-                    </strong>
-
-                    <p>
-                        Vui lòng chuyển đúng số tiền và giữ nguyên
-                        nội dung chuyển khoản để cửa hàng dễ đối soát.
-                    </p>
+                    ⚠ Vui lòng giữ nguyên
+                    số tiền và nội dung chuyển khoản.
 
                 </div>
 
 
-                <form th:action="@{/payment/qr/complete}"
-                      method="post">
 
-                    <input type="hidden"
-                           name="orderId"
-                           th:value="${order.id}">
+                <div class="payment-waiting-status">
 
-                    <button type="submit"
-                            class="qr-complete-btn">
+                    <span class="payment-spinner"></span>
 
-                        Tôi đã thanh toán
+                    <div>
 
-                    </button>
+                        <strong>
+                            Đang chờ thanh toán...
+                        </strong>
 
-                </form>
+                        <p>
+                            Hệ thống sẽ tự xác nhận
+                            sau khi nhận được tiền.
+                        </p>
 
+                    </div>
 
-                <p class="qr-status-note">
-
-                    Sau khi bạn chuyển khoản,
-                    đơn hàng sẽ ở trạng thái
-                    <strong>chờ xác nhận thanh toán</strong>.
-
-                </p>
+                </div>
 
 
             </div>
+
+
+        </div>
+
+
+
+        <!-- THANH TOÁN THÀNH CÔNG -->
+
+        <div class="payment-success-box"
+             id="paymentSuccess"
+             style="display:none;">
+
+
+            <div class="payment-success-icon">
+
+                ✓
+
+            </div>
+
+
+            <h1>
+                Thanh toán thành công
+            </h1>
+
+
+            <p>
+                Hệ thống đã nhận được thanh toán của bạn.
+            </p>
+
+
+            <div class="payment-success-code">
+
+                Mã thanh toán:
+
+                <strong th:text="${order.paymentCode}">
+                    THB1
+                </strong>
+
+            </div>
+
+
+            <p class="payment-redirect-text">
+
+                Đang chuyển đến trang xác nhận đơn hàng...
+
+            </p>
 
 
         </div>
@@ -196,8 +202,122 @@
 </section>
 
 
+
 <div th:replace="~{fragments/footer :: footer}">
 </div>
+
+
+
+<script th:inline="javascript">
+
+    const orderId = /*[[${order.id}]]*/ 0;
+
+    let paymentTimer = null;
+
+
+    async function checkPaymentStatus() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/payment/status/" + orderId,
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Payment status:",
+                data.paymentStatus
+            );
+
+
+            if (data.paid === true) {
+
+                clearInterval(paymentTimer);
+
+                showPaymentSuccess();
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Đang chờ kết nối...",
+                error
+            );
+        }
+    }
+
+
+    function showPaymentSuccess() {
+
+        const waiting =
+            document.getElementById(
+                "paymentWaiting"
+            );
+
+        const success =
+            document.getElementById(
+                "paymentSuccess"
+            );
+
+
+        /*
+         * QR biến mất
+         */
+        waiting.style.display =
+            "none";
+
+
+        /*
+         * Hiện trạng thái thành công
+         */
+        success.style.display =
+            "block";
+
+
+        /*
+         * Sau 2 giây chuyển trang
+         */
+        setTimeout(
+            function () {
+
+                window.location.href =
+                    "/order-success/" + orderId;
+
+            },
+            2000
+        );
+    }
+
+
+    /*
+     * Kiểm tra ngay khi mở trang
+     */
+    checkPaymentStatus();
+
+
+    /*
+     * Sau đó cứ 2 giây kiểm tra lại
+     */
+    paymentTimer =
+        setInterval(
+            checkPaymentStatus,
+            2000
+        );
+
+</script>
 
 
 </body>

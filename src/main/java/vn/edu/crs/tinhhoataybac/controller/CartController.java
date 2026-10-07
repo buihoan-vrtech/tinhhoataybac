@@ -3,146 +3,86 @@ package vn.edu.crs.tinhhoataybac.controller;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import vn.edu.crs.tinhhoataybac.model.Product;
-import vn.edu.crs.tinhhoataybac.service.CartService;
-import vn.edu.crs.tinhhoataybac.service.ProductService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.edu.crs.tinhhoataybac.service.*;
 
 @Controller
 public class CartController {
+  private final CartService cart;
+  private final ProductService products;
 
-    private final CartService cartService;
-    private final ProductService productService;
+  public CartController(CartService cart, ProductService products) {
+    this.cart = cart;
+    this.products = products;
+  }
 
-    public CartController(CartService cartService,
-                          ProductService productService) {
-        this.cartService = cartService;
-        this.productService = productService;
+  @GetMapping("/cart")
+  public String cart(Model m, HttpSession s) {
+    m.addAttribute("cartItems", cart.getCart(s));
+    m.addAttribute("cartTotal", cart.getTotal(s));
+    m.addAttribute("cartCount", cart.getTotalQuantity(s));
+    return "cart";
+  }
+
+  @PostMapping("/cart/add")
+  public String add(
+      @RequestParam Long productId,
+      @RequestParam(required = false) Double quantity,
+      HttpSession s,
+      RedirectAttributes f) {
+    try {
+      var p = products.getProductById(productId);
+      if (p == null) throw new IllegalStateException("Sản phẩm không tồn tại.");
+      double q = quantity == null ? p.getMinimumOrderQuantity() : quantity;
+      p.validateQuantity(q);
+      if (p.getStock() == null || q > p.getStock())
+        throw new IllegalStateException("Không đủ tồn kho.");
+      double total =
+          cart.getCart(s).stream()
+                  .filter(i -> i.getProduct().getId().equals(productId))
+                  .mapToDouble(i -> i.getQuantity())
+                  .sum()
+              + q;
+      if (total > p.getStock())
+        throw new IllegalStateException("Tổng số lượng trong giỏ vượt tồn kho.");
+      cart.addToCart(s, p, q);
+    } catch (IllegalStateException e) {
+      f.addFlashAttribute("error", e.getMessage());
     }
+    return "redirect:/cart";
+  }
 
-
-    // =========================
-    // HIỂN THỊ GIỎ HÀNG
-    // =========================
-    @GetMapping("/cart")
-    public String cart(Model model,
-                       HttpSession session) {
-
-        model.addAttribute(
-                "cartItems",
-                cartService.getCart(session)
-        );
-
-        model.addAttribute(
-                "cartTotal",
-                cartService.getTotal(session)
-        );
-
-        model.addAttribute(
-                "cartCount",
-                cartService.getTotalQuantity(session)
-        );
-
-        return "cart";
+  @PostMapping("/cart/update")
+  public String update(
+      @RequestParam Long productId,
+      @RequestParam double quantity,
+      HttpSession s,
+      RedirectAttributes f) {
+    try {
+      var p = products.getProductById(productId);
+      if (p == null) throw new IllegalStateException("Sản phẩm không tồn tại.");
+      if (quantity > 0) {
+        p.validateQuantity(quantity);
+        if (p.getStock() == null || quantity > p.getStock())
+          throw new IllegalStateException("Không đủ tồn kho.");
+      }
+      cart.updateQuantity(s, productId, quantity);
+    } catch (IllegalStateException e) {
+      f.addFlashAttribute("error", e.getMessage());
     }
+    return "redirect:/cart";
+  }
 
+  @PostMapping("/cart/remove")
+  public String remove(@RequestParam Long productId, HttpSession s) {
+    cart.removeFromCart(s, productId);
+    return "redirect:/cart";
+  }
 
-    // =========================
-    // THÊM VÀO GIỎ
-    // =========================
-    @PostMapping("/cart/add")
-    public String addToCart(
-            @RequestParam Long productId,
-            @RequestParam(defaultValue = "1") int quantity,
-            HttpSession session) {
-
-        Product product =
-                productService.getProductById(productId);
-
-        if (product == null) {
-            return "redirect:/products";
-        }
-
-        if (quantity < 1) {
-            quantity = 1;
-        }
-
-        if (product.getStock() != null
-                && quantity > product.getStock()) {
-
-            quantity = product.getStock();
-        }
-
-        cartService.addToCart(
-                session,
-                product,
-                quantity
-        );
-
-        return "redirect:/cart";
-    }
-
-
-    // =========================
-    // CẬP NHẬT SỐ LƯỢNG
-    // =========================
-    @PostMapping("/cart/update")
-    public String updateCart(
-            @RequestParam Long productId,
-            @RequestParam int quantity,
-            HttpSession session) {
-
-        Product product =
-                productService.getProductById(productId);
-
-        if (product == null) {
-            return "redirect:/cart";
-        }
-
-        if (product.getStock() != null
-                && quantity > product.getStock()) {
-
-            quantity = product.getStock();
-        }
-
-        cartService.updateQuantity(
-                session,
-                productId,
-                quantity
-        );
-
-        return "redirect:/cart";
-    }
-
-
-    // =========================
-    // XÓA 1 SẢN PHẨM
-    // =========================
-    @PostMapping("/cart/remove")
-    public String removeFromCart(
-            @RequestParam Long productId,
-            HttpSession session) {
-
-        cartService.removeFromCart(
-                session,
-                productId
-        );
-
-        return "redirect:/cart";
-    }
-
-
-    // =========================
-    // XÓA TOÀN BỘ GIỎ
-    // =========================
-    @PostMapping("/cart/clear")
-    public String clearCart(
-            HttpSession session) {
-
-        cartService.clearCart(session);
-
-        return "redirect:/cart";
-    }
+  @PostMapping("/cart/clear")
+  public String clear(HttpSession s) {
+    cart.clearCart(s);
+    return "redirect:/cart";
+  }
 }

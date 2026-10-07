@@ -190,4 +190,40 @@ public class Order {
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
     }
+  private BigDecimal subtotal;
+ public BigDecimal getSubtotal() {return subtotal;}
+ public void setSubtotal(BigDecimal value) {subtotal=value;}
+  private BigDecimal shippingFee;
+ public BigDecimal getShippingFee() {return shippingFee;}
+ public void setShippingFee(BigDecimal value) {shippingFee=value;}
+  private BigDecimal discount;
+ public BigDecimal getDiscount() {return discount;}
+ public void setDiscount(BigDecimal value) {discount=value;}
+  private String voucherCode;
+ public String getVoucherCode() {return voucherCode;}
+ public void setVoucherCode(String value) {voucherCode=value;}
+  private String shippingMethod;
+ public String getShippingMethod() {return shippingMethod;}
+ public void setShippingMethod(String value) {shippingMethod=value;}
+  private String shippingCarrier;
+ public String getShippingCarrier() {return shippingCarrier;}
+ public void setShippingCarrier(String value) {shippingCarrier=value;}
+  private String trackingCode;
+ public String getTrackingCode() {return trackingCode;}
+ public void setTrackingCode(String value) {trackingCode=value;}
+  private LocalDateTime paymentExpiresAt;
+ public LocalDateTime getPaymentExpiresAt() {return paymentExpiresAt;}
+ public void setPaymentExpiresAt(LocalDateTime value) {paymentExpiresAt=value;}
+ @ManyToOne private User customer;
+ public User getCustomer() {return customer;}
+ public void setCustomer(User value) {customer=value;}
+  private String shipmentStatus = "preparing";
+ public String getShipmentStatus() {return shipmentStatus;}
+ public void setShipmentStatus(String value) {shipmentStatus=value;}
+ @org.springframework.format.annotation.DateTimeFormat(iso=org.springframework.format.annotation.DateTimeFormat.ISO.DATE) private java.time.LocalDate estimatedDeliveryAt;
+ public java.time.LocalDate getEstimatedDeliveryAt() {return estimatedDeliveryAt;}
+ public void setEstimatedDeliveryAt(java.time.LocalDate value) {estimatedDeliveryAt=value;}
+ public String getOrderStatusLabel(){return switch(orderStatus==null?"":orderStatus){case "PENDING"->"Chờ xác nhận";case "CONFIRMED"->"Đã xác nhận";case "SHIPPING"->"Đang giao hàng";case "COMPLETED"->"Đã giao hàng";case "CANCELLED"->"Đã hủy";default->"Chưa xác định";};}
+ public String getPaymentStatusLabel(){return switch(paymentStatus==null?"":paymentStatus){case "PENDING"->"Chờ thanh toán";case "UNPAID"->"Chưa thanh toán";case "PAID"->"Đã thanh toán";case "REFUNDED"->"Đã hoàn tiền";default->"Chưa xác định";};}
+ public String getPaymentMethodLabel(){return switch(paymentMethod==null?"":paymentMethod){case "QR"->"Chuyển khoản";case "COD"->"Thanh toán khi nhận hàng";case "WALLET"->"Ví Tinh Hoa";default->"Chưa xác định";};}
 }

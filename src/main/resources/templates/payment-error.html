@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Thanh toán không thành công
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<section class="order-success-page">
+
+    <div class="container">
+
+        <div class="order-success-box">
+
+            <div class="success-icon"
+                 style="background:#a94442;">
+
+                !
+
+            </div>
+
+
+            <h1>
+                Thanh toán chưa hoàn tất
+            </h1>
+
+
+            <p th:text="${message}">
+                Có lỗi xảy ra.
+            </p>
+
+
+            <div class="success-actions">
+
+                <a th:href="@{/cart}"
+                   class="success-primary-btn">
+
+                    Quay lại giỏ hàng
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
+
+</html>

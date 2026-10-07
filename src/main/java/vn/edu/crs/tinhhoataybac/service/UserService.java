@@ -27,7 +27,8 @@ public class UserService implements UserDetailsService {
                          String password,
                          String phone) {
 
-        email = email.trim().toLowerCase();
+        if(fullName==null||fullName.isBlank()||fullName.length()>255||email==null||!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")||password==null||password.length()<8||password.length()>72)throw new IllegalStateException("Nhập tên, email hợp lệ và mật khẩu từ 8 đến 72 ký tự.");
+        email = email.trim().toLowerCase(java.util.Locale.ROOT);
 
         if (userRepository.existsByEmail(email)) {
 

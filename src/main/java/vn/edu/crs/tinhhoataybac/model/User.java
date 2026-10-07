@@ -129,4 +129,10 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+ @Column(length=1000) private String avatar;
+ public String getAvatar() {return avatar;}
+ public void setAvatar(String value) {avatar=value;}
+  private LocalDateTime emailVerifiedAt;
+ public LocalDateTime getEmailVerifiedAt() {return emailVerifiedAt;}
+ public void setEmailVerifiedAt(LocalDateTime value) {emailVerifiedAt=value;}
 }

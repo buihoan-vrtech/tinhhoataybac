@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Uploaded customer and product media
+/uploads/

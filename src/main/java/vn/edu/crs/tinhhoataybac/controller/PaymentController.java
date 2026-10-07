@@ -1,111 +1,174 @@
 package vn.edu.crs.tinhhoataybac.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import vn.edu.crs.tinhhoataybac.model.Order;
 import vn.edu.crs.tinhhoataybac.service.OrderService;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import vn.edu.crs.tinhhoataybac.service.SePayService;
 
 @Controller
 public class PaymentController {
 
+    private final vn.edu.crs.tinhhoataybac.service.CommerceService commerce;
+    private final vn.edu.crs.tinhhoataybac.service.UserService users;
     private final OrderService orderService;
 
-    @Value("${payment.qr.bank-id}")
-    private String bankId;
+    private final SePayService sePayService;
 
-    @Value("${payment.qr.account-no}")
-    private String accountNo;
-
-    @Value("${payment.qr.account-name}")
-    private String accountName;
 
     public PaymentController(
-            OrderService orderService) {
+            OrderService orderService,
+            SePayService sePayService,
+            vn.edu.crs.tinhhoataybac.service.CommerceService commerce,
+            vn.edu.crs.tinhhoataybac.service.UserService users) {
+        this.commerce=commerce;this.users=users;
 
         this.orderService = orderService;
+        this.sePayService = sePayService;
     }
+
 
     @GetMapping("/payment/qr/{orderId}")
     public String qrPayment(
             @PathVariable Long orderId,
-            Model model) {
+            Model model, org.springframework.security.core.Authentication authentication) {
 
         Order order =
                 orderService.getOrderById(orderId);
 
-        if (order == null) {
+
+        if (order == null || !commerce.owns(order,users.findByEmail(authentication.getName()))) {
             return "redirect:/";
         }
 
-        if (!"QR".equals(order.getPaymentMethod())) {
+
+        if ("CANCELLED".equals(order.getOrderStatus())) return "redirect:/account/orders/"+orderId;
+        /*
+         * Nếu đơn không dùng QR.
+         */
+        if (!"QR".equalsIgnoreCase(
+                order.getPaymentMethod()
+        )) {
+
             return "redirect:/order-success/"
                     + orderId;
         }
 
-        String encodedInfo =
-                URLEncoder.encode(
-                        order.getPaymentCode(),
-                        StandardCharsets.UTF_8
-                );
 
-        String encodedName =
-                URLEncoder.encode(
-                        accountName,
-                        StandardCharsets.UTF_8
-                );
+        /*
+         * Nếu đã thanh toán rồi.
+         */
+        if ("PAID".equalsIgnoreCase(
+                order.getPaymentStatus()
+        )) {
 
-        String qrUrl =
-                "https://img.vietqr.io/image/"
-                        + bankId
-                        + "-"
-                        + accountNo
-                        + "-compact2.png"
-                        + "?amount="
-                        + order.getTotalAmount()
-                        .toBigInteger()
-                        + "&addInfo="
-                        + encodedInfo
-                        + "&accountName="
-                        + encodedName;
+            return "redirect:/order-success/"
+                    + orderId;
+        }
+
 
         model.addAttribute(
                 "order",
                 order
         );
 
-        model.addAttribute(
-                "qrUrl",
-                qrUrl
-        );
 
         model.addAttribute(
-                "bankId",
-                bankId
+                "checkoutUrl",
+                sePayService.getCheckoutUrl()
         );
+
 
         model.addAttribute(
-                "accountNo",
-                accountNo
+                "sepayFields",
+                sePayService.buildCheckoutFields(order)
         );
 
-        model.addAttribute(
-                "accountName",
-                accountName
-        );
 
-        return "qr-payment";
+        return "sepay-checkout";
     }
 
-    @PostMapping("/payment/qr/complete")
-    public String qrComplete(
-            @RequestParam Long orderId) {
 
-        return "redirect:/order-success/"
+    /*
+     * SePay redirect về đây sau khi
+     * quá trình thanh toán thành công.
+     *
+     * KHÔNG đánh dấu PAID ở đây.
+     *
+     * Trạng thái PAID phải lấy từ IPN.
+     */
+    @GetMapping("/payment/sepay/success/{orderId}")
+    public String sePaySuccess(
+            @PathVariable Long orderId) {
+
+        return "redirect:/payment/wait/"
                 + orderId;
+    }
+
+
+    @GetMapping("/payment/sepay/error/{orderId}")
+    public String sePayError(
+            @PathVariable Long orderId,
+            Model model, org.springframework.security.core.Authentication authentication) {
+
+        model.addAttribute(
+                "message",
+                "Thanh toán không thành công."
+        );
+
+        return "payment-error";
+    }
+
+
+    @GetMapping("/payment/sepay/cancel/{orderId}")
+    public String sePayCancel(
+            @PathVariable Long orderId,
+            Model model, org.springframework.security.core.Authentication authentication) {
+
+        model.addAttribute(
+                "message",
+                "Bạn đã hủy thanh toán."
+        );
+
+        return "payment-error";
+    }
+
+
+    /*
+     * Trang đợi IPN xác nhận.
+     */
+    @GetMapping("/payment/wait/{orderId}")
+    public String paymentWait(
+            @PathVariable Long orderId,
+            Model model, org.springframework.security.core.Authentication authentication) {
+
+        Order order =
+                orderService.getOrderById(orderId);
+
+
+        if (order == null || !commerce.owns(order,users.findByEmail(authentication.getName()))) {
+            return "redirect:/";
+        }
+
+
+        if ("PAID".equalsIgnoreCase(
+                order.getPaymentStatus()
+        )) {
+
+            return "redirect:/order-success/"
+                    + orderId;
+        }
+
+
+        model.addAttribute(
+                "order",
+                order
+        );
+
+
+        return "payment-wait";
     }
 }

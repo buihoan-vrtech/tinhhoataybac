@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Nạp tiền vào ví | Tinh Hoa Tây Bắc</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+<div style="
+    max-width: 650px;
+    margin: 60px auto;
+    padding: 20px;
+">
+
+    <div style="
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+        text-align: center;
+    ">
+
+        <p style="
+            color: #b58b3a;
+            font-weight: bold;
+        ">
+            NẠP TIỀN VÀO VÍ
+        </p>
+
+
+        <h1 style="color: #24472b;">
+            Xác nhận nạp tiền
+        </h1>
+
+
+        <p>Mã giao dịch</p>
+
+        <h2 style="color:#355c3a;"
+            th:text="${topUp.paymentCode}">
+            NAP1
+        </h2>
+
+
+        <p>Số tiền cần thanh toán</p>
+
+        <h2 style="
+            font-size: 34px;
+            color: #b36b18;
+        ">
+
+            <span th:text="${#numbers.formatDecimal(
+                    topUp.amount,
+                    0,
+                    'COMMA',
+                    0,
+                    'POINT'
+            )}">
+                100000
+            </span>
+
+            ₫
+
+        </h2>
+
+
+        <form th:action="${checkoutUrl}"
+              method="post">
+
+            <input th:each="entry : ${sepayFields}"
+                   type="hidden"
+                   th:name="${entry.key}"
+                   th:value="${entry.value}">
+
+
+            <button type="submit"
+                    style="
+                    width: 100%;
+                    margin-top: 25px;
+                    padding: 16px;
+                    border: none;
+                    border-radius: 10px;
+                    background: #355c3a;
+                    color: white;
+                    font-size: 17px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    ">
+
+                Thanh toán bằng SePay
+
+            </button>
+
+        </form>
+
+
+        <a th:href="@{/wallet/topup}"
+           style="
+           display:block;
+           margin-top:20px;
+           text-decoration:none;
+           color:#666;
+           ">
+
+            ← Quay lại
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

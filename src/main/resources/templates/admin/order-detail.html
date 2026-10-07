@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Chi tiết đơn hàng | Admin</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+<link rel="stylesheet" href="/css/features.css"></head>
+
+<body>
+<div class="feature-main"><nav class="feature-nav"><a href="/admin/dashboard">Tổng quan</a><a href="/admin/products">Sản phẩm</a><a href="/admin/categories">Danh mục</a><a href="/admin/orders">Đơn hàng</a><a href="/admin/vouchers">Voucher</a><a href="/admin/service-requests">Hủy / hoàn tiền</a><a href="/admin/wallets">Ví</a><a href="/admin/customers">Khách hàng</a><a href="/admin/reviews">Đánh giá</a></nav><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+<section style="
+    max-width:1100px;
+    margin:50px auto;
+    padding:20px;
+">
+
+
+    <a th:href="@{/admin/orders}"
+       style="
+       color:#355c3a;
+       text-decoration:none;
+       font-weight:600;
+       ">
+        ← Quay lại danh sách đơn
+    </a>
+
+
+    <div style="margin-top:25px;">
+
+        <p style="
+            color:#b58b3a;
+            font-weight:700;
+            margin-bottom:5px;
+        ">
+            CHI TIẾT ĐƠN HÀNG
+        </p>
+
+        <h1 style="
+            color:#24472b;
+            margin-top:0;
+        "
+            th:text="'Đơn hàng #' + ${order.id}">
+            Đơn hàng #1
+        </h1>
+
+    </div>
+
+
+    <!-- MESSAGE -->
+
+    <div th:if="${param.updated}"
+         style="
+         background:#e7f5e9;
+         color:#23652d;
+         padding:14px 18px;
+         border-radius:10px;
+         margin-bottom:20px;
+         ">
+        ✅ Cập nhật trạng thái thành công.
+    </div>
+
+
+    <div th:if="${param.error}"
+         style="
+         background:#ffe8e8;
+         color:#a60000;
+         padding:14px 18px;
+         border-radius:10px;
+         margin-bottom:20px;
+         ">
+        Có lỗi khi cập nhật trạng thái.
+    </div>
+
+
+    <!-- GRID -->
+
+    <div style="
+        display:grid;
+        grid-template-columns:2fr 1fr;
+        gap:25px;
+    ">
+
+
+        <!-- LEFT -->
+
+        <div>
+
+
+            <!-- CUSTOMER -->
+
+            <div style="
+                background:white;
+                padding:28px;
+                border-radius:16px;
+                margin-bottom:25px;
+                box-shadow:0 6px 20px rgba(0,0,0,.06);
+            ">
+
+                <h2>
+                    Thông tin khách hàng
+                </h2>
+
+
+                <p>
+                    <strong>Họ tên:</strong>
+
+                    <span th:text="${order.customerName}">
+                        Khách hàng
+                    </span>
+                </p>
+
+
+                <p>
+                    <strong>Điện thoại:</strong>
+
+                    <span th:text="${order.phone}">
+                        0900000000
+                    </span>
+                </p>
+
+
+                <p>
+                    <strong>Email:</strong>
+
+                    <span th:text="${order.email}">
+                        email@gmail.com
+                    </span>
+                </p>
+
+
+                <p>
+                    <strong>Địa chỉ:</strong>
+
+                    <span th:text="${order.address}">
+                        Hà Nội
+                    </span>
+                </p>
+
+
+                <p th:if="${order.note != null && !order.note.isBlank()}">
+
+                    <strong>Ghi chú:</strong>
+
+                    <span th:text="${order.note}">
+                        Ghi chú
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <!-- PRODUCTS -->
+
+            <div style="
+                background:white;
+                padding:28px;
+                border-radius:16px;
+                box-shadow:0 6px 20px rgba(0,0,0,.06);
+            ">
+
+                <h2>
+                    Sản phẩm
+                </h2>
+
+
+                <div th:each="detail : ${order.orderDetails}"
+                     style="
+                     display:grid;
+                     grid-template-columns:80px 1fr auto;
+                     gap:15px;
+                     align-items:center;
+                     padding:18px 0;
+                     border-bottom:1px solid #eee;
+                     ">
+
+                    <img th:src="${detail.product.image}"
+                         th:alt="${detail.product.name}"
+                         style="
+                         width:80px;
+                         height:80px;
+                         object-fit:cover;
+                         border-radius:10px;
+                         ">
+
+
+                    <div>
+
+                        <strong th:text="${detail.product.name}">
+                            Sản phẩm
+                        </strong>
+
+                        <p style="
+                            margin:5px 0 0 0;
+                            color:#777;
+                            ">
+
+                            Số lượng:
+
+                            <span th:text="${detail.quantity}">
+                                1
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+                    <strong>
+
+                        <span th:text="${#numbers.formatDecimal(
+                        detail.subtotal,
+                        0,
+                        'POINT',
+                        0,
+                        'COMMA'
+                        )}">
+                            0
+                        </span>
+
+                        đ
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <aside>
+
+
+            <div style="
+                background:white;
+                padding:28px;
+                border-radius:16px;
+                margin-bottom:25px;
+                box-shadow:0 6px 20px rgba(0,0,0,.06);
+            ">
+
+                <h2>
+                    Trạng thái
+                </h2>
+
+
+                <p>
+
+                    <strong>Thanh toán:</strong>
+
+                    <span th:text="${order.paymentStatusLabel}">
+                        PAID
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>Phương thức:</strong>
+
+                    <span th:text="${order.paymentMethodLabel}">
+                        QR
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>Mã thanh toán:</strong>
+
+                    <span th:text="${order.paymentCode}">
+                        THB1
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>Trạng thái đơn:</strong>
+
+                    <span th:text="${order.orderStatusLabel}">
+                        CONFIRMED
+                    </span>
+
+                </p>
+
+
+                <form th:action="@{/admin/orders/{id}/status(id=${order.id})}"
+                      method="post"
+                      style="margin-top:20px;">
+
+
+                    <label style="
+                        display:block;
+                        font-weight:700;
+                        margin-bottom:8px;
+                    ">
+                        Cập nhật trạng thái
+                    </label>
+
+
+                    <select name="status"
+                            style="
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:8px;
+                            margin-bottom:12px;
+                            ">
+
+                        <option value="PENDING"
+                                th:selected="${order.orderStatus == 'PENDING'}">
+                            Chờ xác nhận
+                        </option>
+
+                        <option value="CONFIRMED"
+                                th:selected="${order.orderStatus == 'CONFIRMED'}">
+                            Đã xác nhận
+                        </option>
+
+                        <option value="SHIPPING"
+                                th:selected="${order.orderStatus == 'SHIPPING'}">
+                            Đang giao hàng
+                        </option>
+
+                        <option value="COMPLETED"
+                                th:selected="${order.orderStatus == 'COMPLETED'}">
+                            Đã giao hàng
+                        </option>
+
+                        <option value="CANCELLED"
+                                th:selected="${order.orderStatus == 'CANCELLED'}">
+                            Đã hủy
+                        </option>
+
+                    </select>
+
+
+                    <button type="submit"
+                            style="
+                            width:100%;
+                            padding:12px;
+                            border:none;
+                            border-radius:8px;
+                            background:#355c3a;
+                            color:white;
+                            font-weight:700;
+                            cursor:pointer;
+                            ">
+                        Cập nhật
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div style="
+                background:#294d30;
+                color:white;
+                padding:28px;
+                border-radius:16px;
+            ">
+
+                <span>
+                    Tổng thanh toán
+                </span>
+
+                <h2 style="
+                    font-size:30px;
+                    margin-bottom:0;
+                ">
+
+                    <span th:text="${#numbers.formatDecimal(
+                    order.totalAmount,
+                    0,
+                    'POINT',
+                    0,
+                    'COMMA'
+                    )}">
+                        0
+                    </span>
+
+                    đ
+
+                </h2>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+<section class="feature-card"><h2>Vận chuyển</h2><form class="feature-form" th:action="@{/admin/orders/{id}/shipment(id=${order.id})}" method="post"><label>Đơn vị vận chuyển<input name="carrier" th:value="${order.shippingCarrier}" required></label><label>Mã vận đơn<input name="trackingCode" th:value="${order.trackingCode}" required></label><label>Trạng thái giao hàng<select name="shipmentStatus"><option value="preparing">Chuẩn bị hàng</option><option value="handed_over">Đã bàn giao vận chuyển</option><option value="in_transit">Đang vận chuyển</option><option value="out_for_delivery">Đang giao đến khách</option><option value="delivery_failed">Giao chưa thành công</option><option value="returned">Đã hoàn về shop</option></select></label><label>Ngày giao dự kiến<input name="estimatedDeliveryAt" type="date" th:value="${order.estimatedDeliveryAt}"></label><label>Vị trí<input name="location" maxlength="150"></label><label>Ghi chú<input name="note" maxlength="1000"></label><button>Lưu vận chuyển</button></form></section><section class="feature-card"><h2>Lịch sử đơn hàng</h2><p th:if="${histories.isEmpty()}">Chưa có lịch sử.</p><div th:each="h:${histories}"><strong th:text="${h.status}"></strong><p th:text="${h.note}"></p><small th:text="${h.createdAt}"></small></div></section><section class="feature-card"><h2>Yêu cầu của khách hàng</h2><div th:each="r:${requests}"><strong th:text="${r.type + ' · ' + r.status}"></strong><p th:text="${r.reason}"></p><p th:text="${r.adminNote}"></p></div></section></section>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<div class="feature-main"><section class="feature-card"><h2>Hành trình giao hàng</h2><p th:if="${order.estimatedDeliveryAt != null}" th:text="${'Dự kiến giao: ' + order.estimatedDeliveryAt}"></p><p th:if="${shipmentEvents.isEmpty()}">Chưa có cập nhật hành trình.</p><div th:each="e:${shipmentEvents}"><strong th:text="${e.status + ' · ' + e.carrier}"></strong><p th:text="${e.location}"></p><p th:text="${e.note}"></p><small th:text="${e.createdAt}"></small></div></section></div><div class="feature-main"><section class="feature-card" th:if="${order.paymentMethod == 'QR' and order.paymentStatus != 'PAID' and order.orderStatus != 'CANCELLED'}"><h2>Xác nhận chuyển khoản</h2><form th:action="@{/admin/orders/{id}/payment(id=${order.id})}" method="post"><label><input type="checkbox" name="received" value="true" required> Đã nhận đủ tiền của đơn này vào ngân hàng</label><button>Xác nhận thanh toán</button></form></section></div></body>
+</html>
