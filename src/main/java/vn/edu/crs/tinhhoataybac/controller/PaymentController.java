@@ -14,6 +14,7 @@ public class PaymentController {
 
     private final vn.edu.crs.tinhhoataybac.service.CommerceService commerce;
     private final vn.edu.crs.tinhhoataybac.service.UserService users;
+    private final vn.edu.crs.tinhhoataybac.service.BankQrService bankQr;
     private final OrderService orderService;
 
     private final SePayService sePayService;
@@ -23,7 +24,9 @@ public class PaymentController {
             OrderService orderService,
             SePayService sePayService,
             vn.edu.crs.tinhhoataybac.service.CommerceService commerce,
-            vn.edu.crs.tinhhoataybac.service.UserService users) {
+            vn.edu.crs.tinhhoataybac.service.UserService users,
+            vn.edu.crs.tinhhoataybac.service.BankQrService bankQr) {
+        this.bankQr=bankQr;
         this.commerce=commerce;this.users=users;
 
         this.orderService = orderService;
@@ -76,19 +79,12 @@ public class PaymentController {
         );
 
 
-        model.addAttribute(
-                "checkoutUrl",
-                sePayService.getCheckoutUrl()
-        );
-
-
-        model.addAttribute(
-                "sepayFields",
-                sePayService.buildCheckoutFields(order)
-        );
-
-
-        return "sepay-checkout";
+        model.addAttribute("qrUrl",bankQr.url(order));
+        model.addAttribute("paymentExpires",order.getPaymentExpiresAt()==null?"":order.getPaymentExpiresAt().atZone(java.time.ZoneId.systemDefault()).toInstant().toString());
+        model.addAttribute("bank",bankQr.bank());
+        model.addAttribute("bankAccount",bankQr.account());
+        model.addAttribute("bankHolder",bankQr.holder());
+        return "qr-payment";
     }
 
 

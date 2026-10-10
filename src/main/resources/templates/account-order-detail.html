@@ -8,23 +8,106 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Chi tiết đơn hàng | Tinh Hoa Tây Bắc</title>
+    <title>
+        Chi tiết đơn hàng | Tinh Hoa Tây Bắc
+    </title>
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
-<link rel="stylesheet" href="/css/features.css"></head>
 
-<body>
-<div class="feature-main"><nav class="feature-nav"><a href="/account/profile">Hồ sơ</a><a href="/account/addresses">Địa chỉ</a><a href="/account/orders">Đơn hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
+    <link rel="stylesheet"
+          th:href="@{/css/features.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/gifts.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/account.css(v=20261010)}">
+
+</head>
 
 
-<div th:replace="~{fragments/header :: header}"></div>
+<body class="account-area">
 
+
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<div th:replace="~{fragments/header :: header}">
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TRANG CHI TIẾT ĐƠN -->
+<!-- ========================================================= -->
 
 <section class="account-page">
 
+
+    <!-- ===================================================== -->
+    <!-- THÔNG BÁO -->
+    <!-- ===================================================== -->
+
     <div class="container">
 
+
+        <div th:if="${success != null}"
+             class="notice success"
+             th:text="${success}">
+            Thành công
+        </div>
+
+
+        <div th:if="${error != null}"
+             class="notice error"
+             th:text="${error}">
+            Có lỗi xảy ra
+        </div>
+
+
+        <!-- Hủy đơn trực tiếp thành công -->
+
+        <div th:if="${param.cancelled}"
+             class="notice success">
+
+            <strong>
+                Đơn hàng đã được hủy thành công.
+            </strong>
+
+            <p th:if="${order.refunded}">
+                Số tiền thanh toán đã được hoàn về
+                Ví Tinh Hoa của bạn.
+            </p>
+
+        </div>
+
+
+        <!-- Lỗi hủy đơn -->
+
+        <div th:if="${param.cancelError}"
+             class="notice error">
+
+            <strong>
+                Không thể hủy đơn hàng.
+            </strong>
+
+            <p th:text="${param.cancelError[0]}">
+                Có lỗi xảy ra.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="container">
+
+
+        <!-- ================================================= -->
+        <!-- QUAY LẠI -->
+        <!-- ================================================= -->
 
         <div class="order-detail-back">
 
@@ -35,23 +118,31 @@
         </div>
 
 
+        <!-- ================================================= -->
+        <!-- TIÊU ĐỀ -->
+        <!-- ================================================= -->
+
         <div class="account-heading">
 
-            <span>CHI TIẾT ĐƠN HÀNG</span>
+            <span>
+                CHI TIẾT ĐƠN HÀNG
+            </span>
+
 
             <h1 th:text="'Đơn hàng #' + ${order.id}">
                 Đơn hàng #1
             </h1>
+
 
             <p th:if="${order.createdAt != null}">
 
                 Đặt lúc
 
                 <span th:text="${#temporals.format(
-                order.createdAt,
-                'dd/MM/yyyy HH:mm'
+                        order.createdAt,
+                        'dd/MM/yyyy HH:mm'
                 )}">
-                    01/01/2026
+                    01/01/2026 08:00
                 </span>
 
             </p>
@@ -59,16 +150,95 @@
         </div>
 
 
+        <!-- ================================================= -->
+        <!-- TRẠNG THÁI HỦY -->
+        <!-- ================================================= -->
+
+        <div th:if="${order.orderStatus == 'CANCELLED'}"
+             style="
+             margin-bottom: 24px;
+             padding: 18px 20px;
+             border-radius: 12px;
+             background: #fff2ef;
+             border: 1px solid #ebcbc4;
+             color: #9d392c;
+             ">
+
+            <strong style="
+                display: block;
+                font-size: 17px;
+                margin-bottom: 7px;
+            ">
+                Đơn hàng đã bị hủy
+            </strong>
+
+
+            <p th:if="${order.cancelledAt != null}"
+               style="margin: 0 0 6px;">
+
+                Thời gian hủy:
+
+                <span th:text="${#temporals.format(
+                        order.cancelledAt,
+                        'dd/MM/yyyy HH:mm'
+                )}">
+                </span>
+
+            </p>
+
+
+            <p th:if="${order.cancelReason != null
+                    && !order.cancelReason.isBlank()}"
+               style="margin: 0 0 6px;">
+
+                Lý do:
+
+                <strong th:text="${order.cancelReason}">
+                </strong>
+
+            </p>
+
+
+            <p th:if="${order.refunded}"
+               style="
+               margin: 8px 0 0;
+               color: #267448;
+               ">
+
+                ✓ Tiền đã được hoàn về Ví Tinh Hoa.
+
+            </p>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- LAYOUT -->
+        <!-- ================================================= -->
+
         <div class="order-detail-layout">
 
+
+            <!-- ================================================= -->
+            <!-- CỘT TRÁI -->
+            <!-- ================================================= -->
 
             <div class="order-detail-main">
 
 
+                <!-- ============================================= -->
+                <!-- SẢN PHẨM -->
+                <!-- ============================================= -->
+
                 <div class="order-detail-card">
 
+
                     <div class="order-detail-card-title">
-                        <h2>Sản phẩm</h2>
+
+                        <h2>
+                            Sản phẩm
+                        </h2>
+
                     </div>
 
 
@@ -82,36 +252,61 @@
 
                         <div class="order-detail-product-info">
 
+
                             <span th:text="${detail.product.category != null
-                            ? detail.product.category.name
-                            : 'Đặc sản Tây Bắc'}">
+                                    ? detail.product.category.name
+                                    : 'Đặc sản Tây Bắc'}">
+
                                 Danh mục
+
                             </span>
+
 
                             <h3 th:text="${detail.product.name}">
                                 Tên sản phẩm
                             </h3>
 
+
+                            <p th:if="${detail.batchCodeSnapshot != null}">
+
+                                <span th:text="${'Lô: '
+                                    + detail.batchCodeSnapshot}">
+                                </span>
+
+
+                                <span th:if="${detail.expirySnapshot != null}"
+                                      th:text="${' · HSD: '
+                                      + detail.expirySnapshot}">
+                                </span>
+
+                            </p>
+
+
                             <p>
+
                                 Số lượng:
+
                                 <strong th:text="${detail.quantity}">
                                     1
                                 </strong>
+
                             </p>
+
 
                         </div>
 
 
                         <div class="order-detail-price">
 
+
                             <span>
 
                                 <span th:text="${#numbers.formatDecimal(
-                                detail.unitPrice,
-                                0,
-                                'COMMA',
-                                0,
-                                'POINT'
+                                        detail.unitPrice,
+                                        0,
+                                        'COMMA',
+                                        0,
+                                        'POINT'
                                 )}">
                                     0
                                 </span>
@@ -124,11 +319,11 @@
                             <strong>
 
                                 <span th:text="${#numbers.formatDecimal(
-                                detail.subtotal,
-                                0,
-                                'COMMA',
-                                0,
-                                'POINT'
+                                        detail.subtotal,
+                                        0,
+                                        'COMMA',
+                                        0,
+                                        'POINT'
                                 )}">
                                     0
                                 </span>
@@ -137,67 +332,268 @@
 
                             </strong>
 
+
                         </div>
 
 
                     </div>
 
+
                 </div>
 
 
+                <!-- ============================================= -->
+                <!-- GIAO HÀNG -->
+                <!-- ============================================= -->
+
                 <div class="order-detail-card">
 
+
                     <div class="order-detail-card-title">
-                        <h2>Thông tin giao hàng</h2>
+
+                        <h2>
+                            Thông tin giao hàng
+                        </h2>
+
                     </div>
 
 
                     <div class="order-customer-grid">
 
+
                         <div>
-                            <span>Người nhận</span>
+
+                            <span>
+                                Người nhận
+                            </span>
+
                             <strong th:text="${order.customerName}">
                                 Người dùng
                             </strong>
+
                         </div>
 
 
                         <div>
-                            <span>Số điện thoại</span>
+
+                            <span>
+                                Số điện thoại
+                            </span>
+
                             <strong th:text="${order.phone}">
                                 0900000000
                             </strong>
+
                         </div>
 
 
                         <div>
-                            <span>Email</span>
+
+                            <span>
+                                Email
+                            </span>
+
                             <strong th:text="${order.email}">
                                 email@gmail.com
                             </strong>
+
                         </div>
 
 
                         <div>
-                            <span>Địa chỉ</span>
+
+                            <span>
+                                Địa chỉ
+                            </span>
+
                             <strong th:text="${order.address}">
                                 Hà Nội
                             </strong>
+
                         </div>
+
 
                     </div>
 
 
-                    <div th:if="${order.note != null && !order.note.isBlank()}"
+                    <div th:if="${order.note != null
+                            && !order.note.isBlank()}"
                          class="order-note">
 
-                        <span>Ghi chú</span>
+
+                        <span>
+                            Ghi chú
+                        </span>
+
 
                         <p th:text="${order.note}">
                             Ghi chú đơn hàng
                         </p>
 
+
                     </div>
+
+
+                </div>
+
+
+                <!-- ============================================= -->
+                <!-- HỦY ĐƠN TRONG 1 GIỜ -->
+                <!-- ============================================= -->
+
+                <div th:if="${canCancel}"
+                     class="order-detail-card"
+                     style="
+                     border: 1px solid #ebd3ce;
+                     background: #fffaf8;
+                     ">
+
+
+                    <div class="order-detail-card-title">
+
+                        <h2 style="color: #a74637;">
+                            Hủy đơn hàng
+                        </h2>
+
+                    </div>
+
+
+                    <p style="
+                        color: #666;
+                        line-height: 1.7;
+                        margin-bottom: 15px;
+                    ">
+
+                        Bạn đang trong thời gian được
+                        <strong>tự hủy đơn trong vòng 1 giờ</strong>
+                        kể từ khi đặt hàng.
+
+                    </p>
+
+
+                    <p style="
+                        padding: 12px 14px;
+                        background: #f6f2e9;
+                        border-radius: 8px;
+                        line-height: 1.6;
+                        margin-bottom: 18px;
+                    ">
+
+                        <span th:if="${order.paymentMethod == 'COD'}">
+
+                            Đơn COD chưa thanh toán:
+                            hệ thống sẽ hủy đơn và trả lại
+                            số lượng sản phẩm vào kho.
+
+                        </span>
+
+
+                        <span th:if="${order.paymentMethod == 'QR'
+                                or order.paymentMethod == 'WALLET'}">
+
+                            Nếu đơn đã thanh toán,
+                            toàn bộ số tiền sẽ được hoàn vào
+                            <strong>Ví Tinh Hoa</strong>
+                            của tài khoản này.
+
+                        </span>
+
+                    </p>
+
+
+                    <form th:action="@{/account/orders/{id}/cancel(
+                                id=${order.id}
+                            )}"
+                          method="post">
+
+
+                        <label style="
+                            display: block;
+                            font-weight: 700;
+                            margin-bottom: 8px;
+                        ">
+
+                            Lý do hủy
+
+                        </label>
+
+
+                        <textarea name="reason"
+                                  rows="4"
+                                  minlength="3"
+                                  maxlength="500"
+                                  placeholder="Ví dụ: Tôi đặt nhầm sản phẩm..."
+                                  style="
+                                  width: 100%;
+                                  box-sizing: border-box;
+                                  padding: 12px 14px;
+                                  border-radius: 8px;
+                                  border: 1px solid #ddd3c8;
+                                  resize: vertical;
+                                  margin-bottom: 15px;
+                                  "></textarea>
+
+
+                        <button type="submit"
+                                onclick="return confirm(
+                                'Bạn chắc chắn muốn hủy đơn hàng này?'
+                                );"
+                                style="
+                                border: none;
+                                border-radius: 8px;
+                                padding: 12px 20px;
+                                background: #b84a3a;
+                                color: white;
+                                font-weight: 700;
+                                cursor: pointer;
+                                ">
+
+                            HỦY ĐƠN NGAY
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+                <!-- ============================================= -->
+                <!-- QUÁ 1 GIỜ -->
+                <!-- ============================================= -->
+
+                <div th:if="${!canCancel
+                            and order.orderStatus != 'CANCELLED'
+                            and order.orderStatus != 'SHIPPING'
+                            and order.orderStatus != 'COMPLETED'}"
+                     class="order-detail-card">
+
+
+                    <div class="order-detail-card-title">
+
+                        <h2>
+                            Hủy đơn hàng
+                        </h2>
+
+                    </div>
+
+
+                    <p style="
+                        line-height: 1.7;
+                        color: #777;
+                        margin: 0;
+                    ">
+
+                        Đơn hàng đã quá thời gian tự hủy
+                        <strong>1 giờ</strong>.
+
+                        Nếu vẫn muốn hủy,
+                        bạn có thể gửi yêu cầu cho cửa hàng
+                        ở phần bên dưới.
+
+                    </p>
+
 
                 </div>
 
@@ -205,14 +601,23 @@
             </div>
 
 
+            <!-- ================================================= -->
+            <!-- TỔNG QUAN -->
+            <!-- ================================================= -->
+
             <aside class="order-detail-summary">
 
-                <h2>Tổng quan</h2>
+
+                <h2>
+                    Tổng quan
+                </h2>
 
 
                 <div class="order-summary-line">
 
-                    <span>Mã thanh toán</span>
+                    <span>
+                        Mã thanh toán
+                    </span>
 
                     <strong th:text="${order.paymentCode}">
                         THB1
@@ -223,7 +628,9 @@
 
                 <div class="order-summary-line">
 
-                    <span>Phương thức</span>
+                    <span>
+                        Phương thức
+                    </span>
 
                     <strong th:text="${order.paymentMethodLabel}">
                         QR
@@ -234,11 +641,16 @@
 
                 <div class="order-summary-line">
 
-                    <span>Thanh toán</span>
+                    <span>
+                        Thanh toán
+                    </span>
+
 
                     <strong class="paid-text"
                             th:text="${order.paymentStatusLabel}">
+
                         PAID
+
                     </strong>
 
                 </div>
@@ -246,7 +658,10 @@
 
                 <div class="order-summary-line">
 
-                    <span>Trạng thái đơn</span>
+                    <span>
+                        Trạng thái đơn
+                    </span>
+
 
                     <strong th:text="${order.orderStatusLabel}">
                         CONFIRMED
@@ -258,52 +673,514 @@
                 <div class="order-summary-line"
                      th:if="${order.paidAt != null}">
 
-                    <span>Thanh toán lúc</span>
+
+                    <span>
+                        Thanh toán lúc
+                    </span>
+
 
                     <strong th:text="${#temporals.format(
-                    order.paidAt,
-                    'dd/MM/yyyy HH:mm'
+                            order.paidAt,
+                            'dd/MM/yyyy HH:mm'
                     )}">
+
                         01/01/2026
+
                     </strong>
+
+
+                </div>
+
+
+                <div class="order-summary-line"
+                     th:if="${order.cancelledAt != null}">
+
+
+                    <span>
+                        Hủy lúc
+                    </span>
+
+
+                    <strong th:text="${#temporals.format(
+                            order.cancelledAt,
+                            'dd/MM/yyyy HH:mm'
+                    )}">
+
+                    </strong>
+
+
+                </div>
+
+
+                <div class="order-summary-line"
+                     th:if="${order.refundedAt != null}">
+
+
+                    <span>
+                        Hoàn tiền lúc
+                    </span>
+
+
+                    <strong th:text="${#temporals.format(
+                            order.refundedAt,
+                            'dd/MM/yyyy HH:mm'
+                    )}">
+
+                    </strong>
+
 
                 </div>
 
 
                 <div class="order-summary-total">
 
-                    <span>Tổng cộng</span>
+
+                    <span>
+                        Tổng cộng
+                    </span>
+
 
                     <strong>
 
                         <span th:text="${#numbers.formatDecimal(
-                        order.totalAmount,
-                        0,
-                        'COMMA',
-                        0,
-                        'POINT'
+                                order.totalAmount,
+                                0,
+                                'COMMA',
+                                0,
+                                'POINT'
                         )}">
+
                             0
+
                         </span>
 
                         ₫
 
                     </strong>
 
+
                 </div>
+
 
             </aside>
 
 
         </div>
 
+
     </div>
+
 
 </section>
 
 
-<div th:replace="~{fragments/footer :: footer}"></div>
+<!-- ========================================================= -->
+<!-- QUÀ TẶNG -->
+<!-- ========================================================= -->
+
+<section class="gift-order"
+         th:if="${order.giftWrapName != null
+         or order.giftMessage != null
+         or order.hidePrices}">
 
 
-<div class="feature-main"><section class="feature-card"><h2>Thông tin vận chuyển</h2><p th:text="${order.shippingCarrier}"></p><p th:text="${order.trackingCode}"></p></section><section class="feature-card"><h2>Lịch sử đơn hàng</h2><p th:if="${histories.isEmpty()}">Chưa có lịch sử.</p><div th:each="h:${histories}"><strong th:text="${h.status}"></strong><p th:text="${h.note}"></p><small th:text="${h.createdAt}"></small></div></section><section class="feature-card"><h2>Yêu cầu của khách hàng</h2><div th:each="r:${requests}"><strong th:text="${r.type + ' · ' + r.status}"></strong><p th:text="${r.reason}"></p><p th:text="${r.adminNote}"></p></div></section><section class="feature-card" th:if="${order.orderStatus == 'PENDING' or order.orderStatus == 'CONFIRMED' or (order.orderStatus == 'COMPLETED' and order.paymentStatus == 'PAID')}"><h2>Gửi yêu cầu cho shop</h2><form class="feature-form" th:action="@{/account/orders/{id}/service-requests(id=${order.id})}" method="post"><label>Loại yêu cầu<select name="type"><option value="cancel" th:if="${order.orderStatus != 'COMPLETED'}">Hủy đơn</option><option value="refund" th:if="${order.orderStatus == 'COMPLETED'}">Hoàn tiền</option></select></label><label>Lý do<textarea name="reason" required minlength="10" maxlength="1000"></textarea></label><button>Gửi yêu cầu</button></form></section></div><div class="feature-main"><section class="feature-card"><h2>Hành trình giao hàng</h2><p th:if="${order.estimatedDeliveryAt != null}" th:text="${'Dự kiến giao: ' + order.estimatedDeliveryAt}"></p><p th:if="${shipmentEvents.isEmpty()}">Chưa có cập nhật hành trình.</p><div th:each="e:${shipmentEvents}"><strong th:text="${e.status + ' · ' + e.carrier}"></strong><p th:text="${e.location}"></p><p th:text="${e.note}"></p><small th:text="${e.createdAt}"></small></div></section></div></body>
+    <h3>
+        Yêu cầu quà tặng
+    </h3>
+
+
+    <p th:if="${order.giftWrapName != null}"
+       th:text="${order.giftWrapName
+       + ' · '
+       + #numbers.formatDecimal(
+           order.giftWrapFee ?: 0,
+           0,
+           'POINT',
+           0,
+           'COMMA'
+       )
+       + ' đ'}">
+    </p>
+
+
+    <p th:if="${order.giftMessage != null}"
+       th:text="${'Lời chúc: '
+       + order.giftMessage}">
+    </p>
+
+
+    <p th:if="${order.hidePrices}">
+        Không kèm giá trong kiện quà.
+    </p>
+
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- THÔNG TIN MỞ RỘNG -->
+<!-- ========================================================= -->
+
+<div class="feature-main">
+
+
+    <!-- ===================================================== -->
+    <!-- VẬN CHUYỂN -->
+    <!-- ===================================================== -->
+
+    <section class="feature-card">
+
+
+        <h2>
+            Thông tin vận chuyển
+        </h2>
+
+
+        <p th:if="${order.shippingCarrier != null
+                && !order.shippingCarrier.isBlank()}">
+
+            Đơn vị:
+
+            <strong th:text="${order.shippingCarrier}">
+            </strong>
+
+        </p>
+
+
+        <p th:if="${order.trackingCode != null
+                && !order.trackingCode.isBlank()}">
+
+            Mã vận đơn:
+
+            <strong th:text="${order.trackingCode}">
+            </strong>
+
+        </p>
+
+
+        <p th:if="${(order.shippingCarrier == null
+                or order.shippingCarrier.isBlank())
+                and
+                (order.trackingCode == null
+                or order.trackingCode.isBlank())}">
+
+            Chưa có thông tin vận chuyển.
+
+        </p>
+
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- LỊCH SỬ -->
+    <!-- ===================================================== -->
+
+    <section class="feature-card">
+
+
+        <h2>
+            Lịch sử đơn hàng
+        </h2>
+
+
+        <p th:if="${histories == null
+                or histories.isEmpty()}">
+
+            Chưa có lịch sử.
+
+        </p>
+
+
+        <div th:each="h : ${histories}"
+             style="
+             padding: 12px 0;
+             border-bottom: 1px solid #eee5d9;
+             ">
+
+
+            <strong th:text="${h.status}">
+            </strong>
+
+
+            <p th:if="${h.note != null}"
+               th:text="${h.note}">
+            </p>
+
+
+            <small th:if="${h.createdAt != null}"
+                   th:text="${#temporals.format(
+                       h.createdAt,
+                       'dd/MM/yyyy HH:mm'
+                   )}">
+            </small>
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- YÊU CẦU CŨ -->
+    <!-- ===================================================== -->
+
+    <section class="feature-card">
+
+
+        <h2>
+            Yêu cầu của khách hàng
+        </h2>
+
+
+        <p th:if="${requests == null
+                or requests.isEmpty()}">
+
+            Chưa có yêu cầu nào.
+
+        </p>
+
+
+        <div th:each="r : ${requests}"
+             style="
+             padding: 12px 0;
+             border-bottom: 1px solid #eee5d9;
+             ">
+
+
+            <strong th:text="${r.type
+                    + ' · '
+                    + r.status}">
+            </strong>
+
+
+            <p th:if="${r.reason != null}"
+               th:text="${r.reason}">
+            </p>
+
+
+            <p th:if="${r.adminNote != null
+                    && !r.adminNote.isBlank()}">
+
+                Phản hồi:
+
+                <span th:text="${r.adminNote}">
+                </span>
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- GỬI YÊU CẦU SAU 1 GIỜ -->
+    <!-- ===================================================== -->
+
+    <section class="feature-card"
+             th:if="${!canCancel
+             and
+             (order.orderStatus == 'PENDING'
+             or order.orderStatus == 'CONFIRMED')}">
+
+
+        <h2>
+            Gửi yêu cầu hủy cho shop
+        </h2>
+
+
+        <p>
+            Đơn đã quá thời gian tự hủy 1 giờ.
+            Yêu cầu này cần cửa hàng xem xét.
+        </p>
+
+
+        <form class="feature-form"
+              th:action="@{/account/orders/{id}/service-requests(
+                    id=${order.id}
+              )}"
+              method="post">
+
+
+            <input type="hidden"
+                   name="type"
+                   value="cancel">
+
+
+            <label>
+
+                Lý do hủy
+
+                <textarea name="reason"
+                          required
+                          minlength="10"
+                          maxlength="1000"
+                          placeholder="Nhập lý do muốn hủy đơn...">
+                </textarea>
+
+            </label>
+
+
+            <button type="submit">
+
+                Gửi yêu cầu hủy
+
+            </button>
+
+
+        </form>
+
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- HOÀN TIỀN SAU KHI HOÀN THÀNH -->
+    <!-- ===================================================== -->
+
+    <section class="feature-card"
+             th:if="${order.orderStatus == 'COMPLETED'
+             and order.paymentStatus == 'PAID'}">
+
+
+        <h2>
+            Yêu cầu hoàn tiền
+        </h2>
+
+
+        <form class="feature-form"
+              th:action="@{/account/orders/{id}/service-requests(
+                    id=${order.id}
+              )}"
+              method="post">
+
+
+            <input type="hidden"
+                   name="type"
+                   value="refund">
+
+
+            <label>
+
+                Lý do yêu cầu hoàn tiền
+
+                <textarea name="reason"
+                          required
+                          minlength="10"
+                          maxlength="1000">
+                </textarea>
+
+            </label>
+
+
+            <button type="submit">
+                Gửi yêu cầu
+            </button>
+
+
+        </form>
+
+
+    </section>
+
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- HÀNH TRÌNH GIAO HÀNG -->
+<!-- ========================================================= -->
+
+<div class="feature-main">
+
+
+    <section class="feature-card">
+
+
+        <h2>
+            Hành trình giao hàng
+        </h2>
+
+
+        <p th:if="${order.estimatedDeliveryAt != null}">
+
+            Dự kiến giao:
+
+            <strong th:text="${#temporals.format(
+                    order.estimatedDeliveryAt,
+                    'dd/MM/yyyy HH:mm'
+            )}">
+            </strong>
+
+        </p>
+
+
+        <p th:if="${shipmentEvents == null
+                or shipmentEvents.isEmpty()}">
+
+            Chưa có cập nhật hành trình.
+
+        </p>
+
+
+        <div th:each="e : ${shipmentEvents}"
+             style="
+             padding: 12px 0;
+             border-bottom: 1px solid #eee5d9;
+             ">
+
+
+            <strong>
+
+                <span th:text="${e.status}">
+                </span>
+
+
+                <span th:if="${e.carrier != null}"
+                      th:text="${' · ' + e.carrier}">
+                </span>
+
+            </strong>
+
+
+            <p th:if="${e.location != null}"
+               th:text="${e.location}">
+            </p>
+
+
+            <p th:if="${e.note != null}"
+               th:text="${e.note}">
+            </p>
+
+
+            <small th:if="${e.createdAt != null}"
+                   th:text="${#temporals.format(
+                           e.createdAt,
+                           'dd/MM/yyyy HH:mm'
+                   )}">
+            </small>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- FOOTER -->
+<!-- ========================================================= -->
+
+<div th:replace="~{fragments/footer :: footer}">
+</div>
+
+
+</body>
 </html>

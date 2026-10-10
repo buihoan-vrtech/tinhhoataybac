@@ -16,12 +16,13 @@
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
-<link rel="stylesheet" href="/css/features.css"></head>
+<link rel="stylesheet" href="/css/food-product.css"><link rel="stylesheet" href="/css/features.css"><link rel="stylesheet" href="/css/catalog.css"></head>
 
 <body>
 <div class="feature-main"><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
 
 
+<span hidden th:attr="data-viewed-id=${product.id}"></span>
 <!-- HEADER -->
 <div th:replace="~{fragments/header :: header}"></div>
 
@@ -109,20 +110,11 @@
 
 
 
-            <div class="detail-rating">
-
-                <span>
-                    ★★★★★
-                </span>
-
-                <small>
-                    Sản phẩm chất lượng
-                </small>
-
-            </div>
+            <div class="detail-rating"><small th:if="${#lists.isEmpty(reviews)}">Chưa có đánh giá</small><small th:unless="${#lists.isEmpty(reviews)}" th:text="${#numbers.formatDecimal(ratingAverage,1,1) + '/5 · ' + #lists.size(reviews) + ' đánh giá'}"></small></div>
 
 
 
+<button class="favorite-detail" type="button" th:attr="data-favorite-id=${product.id},data-product-name=${product.name}" th:aria-label="${'Lưu yêu thích ' + product.name}" aria-pressed="false">♡ Lưu vào yêu thích</button>
             <div class="detail-price"
                  th:text="${#numbers.formatDecimal(
                  product.effectivePrice,
@@ -138,6 +130,7 @@
 
 
 
+<section class="food-options" th:if="${#lists.size(variants)>1 or product.variantLabel != null}"><h3>Chọn quy cách</h3><div class="food-variant-list"><a th:each="v:${variants}" th:href="@{/products/{id}(id=${v.id})}" th:classappend="${v.id == product.id ? 'selected' : ''}" th:attr="aria-current=${v.id == product.id ? 'page' : null}"><strong th:text="${v.variantLabel ?: v.name}"></strong><span th:text="${#numbers.formatDecimal(v.effectivePrice,0,'POINT',0,'COMMA') + ' đ'}"></span><small th:if="${v.stock == null or v.stock <= 0}">Hết hàng</small></a></div></section>
             <!-- STOCK -->
 
             <div class="detail-stock"
@@ -305,29 +298,13 @@
      EXTRA INFO
 ===================================================== -->
 
-<section class="product-extra-info">
-
-    <div class="container">
+<section class="food-information container"><h2>Thông tin sản phẩm &amp; bảo quản</h2><dl><div th:if="${product.origin != null and !#strings.isEmpty(product.origin)}"><dt>Vùng / nơi sản xuất</dt><dd th:text="${product.origin}"></dd></div><div th:if="${product.producer != null and !#strings.isEmpty(product.producer)}"><dt>Nhà sản xuất / hộ sản xuất</dt><dd th:text="${product.producer}"></dd></div><div th:if="${product.ingredients != null and !#strings.isEmpty(product.ingredients)}"><dt>Thành phần</dt><dd th:text="${product.ingredients}"></dd></div><div th:if="${product.allergenInfo != null and !#strings.isEmpty(product.allergenInfo)}"><dt>Thông tin dị ứng</dt><dd th:text="${product.allergenInfo}"></dd></div><div th:if="${product.storageInstructions != null and !#strings.isEmpty(product.storageInstructions)}"><dt>Hướng dẫn bảo quản</dt><dd th:text="${product.storageInstructions}"></dd></div><div th:if="${product.usageInstructions != null and !#strings.isEmpty(product.usageInstructions)}"><dt>Hướng dẫn sử dụng</dt><dd th:text="${product.usageInstructions}"></dd></div><div th:if="${product.shelfLife != null and !#strings.isEmpty(product.shelfLife)}"><dt>Thời hạn sử dụng theo nhãn</dt><dd th:text="${product.shelfLife}"></dd></div><div th:if="${product.nextExpiry != null}"><dt>Hạn dùng sớm nhất trong các lô còn hàng</dt><dd th:text="${#temporals.format(product.nextExpiry,'dd/MM/yyyy')}"></dd></div></dl><p>Ngày sản xuất và hạn sử dụng chính xác được ghi trên bao bì của lô giao thực tế.</p></section>
 
 
-        <div class="product-info-box">
 
-            <h2>
-                Thông tin sản phẩm
-            </h2>
-
-            <p th:text="${product.description}">
-                Thông tin chi tiết sản phẩm
-            </p>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
+<section class="catalog-related" th:if="${!#lists.isEmpty(relatedProducts)}"><div class="container"><h2>Có thể bạn cũng thích</h2><div class="product-grid"><article class="product-card" th:each="related:${relatedProducts}"><a th:href="@{/products/{id}(id=${related.id})}"><img loading="lazy" th:src="${related.image}" th:alt="${related.name}"></a><div class="product-info"><h3><a th:href="@{/products/{id}(id=${related.id})}" th:text="${related.name}"></a></h3><p class="price" th:text="${#numbers.formatDecimal(related.effectivePrice,0,'POINT',0,'COMMA') + 'đ'}"></p></div></article></div></div></section>
+<div class="feature-main"><section class="feature-card" th:if="${!#lists.isEmpty(gallery)}"><h2>Thư viện ảnh</h2><img th:each="i:${gallery}" th:src="${i.url}" th:alt="${product.name}" style="width:150px;height:150px;object-fit:cover;margin:8px;border-radius:12px"></section><section class="feature-card"><h2>Đánh giá từ khách hàng</h2><p th:if="${#lists.isEmpty(reviews)}">Sản phẩm chưa có đánh giá. Hãy chia sẻ trải nghiệm sau khi nhận hàng.</p><div th:each="r:${reviews}"><strong th:text="${r.user.fullName + ' · ' + r.rating + '/5'}"></strong><p th:text="${r.comment}"></p></div><form th:if="${loggedIn}" class="feature-form" th:action="@{/products/{id}/reviews(id=${product.id})}" method="post"><label>Số sao<select name="rating"><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select></label><label>Nội dung<textarea name="comment" maxlength="2000"></textarea></label><button>Gửi đánh giá</button></form><p>Khách đã nhận sản phẩm có thể gửi đánh giá.</p></section></div>
+<div th:replace="~{fragments/saved-products :: recent}"></div>
 
 <!-- FOOTER -->
 <div th:replace="~{fragments/footer :: footer}"></div>
@@ -335,5 +312,5 @@
 
 <script th:src="@{/js/main.js}"></script>
 
-<div class="feature-main"><section class="feature-card"><h2>Thư viện ảnh</h2><img th:each="i:${gallery}" th:src="${i.url}" th:alt="${product.name}" style="width:150px;height:150px;object-fit:cover;margin:8px;border-radius:12px"></section><section class="feature-card"><h2 th:text="${'Đánh giá · ' + #numbers.formatDecimal(ratingAverage,1,1) + '/5'}"></h2><div th:each="r:${reviews}"><strong th:text="${r.user.fullName + ' · ' + r.rating + '/5'}"></strong><p th:text="${r.comment}"></p></div><form th:if="${loggedIn}" class="feature-form" th:action="@{/products/{id}/reviews(id=${product.id})}" method="post"><label>Số sao<select name="rating"><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select></label><label>Nội dung<textarea name="comment" maxlength="2000"></textarea></label><button>Gửi đánh giá</button></form><p>Khách đã nhận sản phẩm có thể gửi đánh giá.</p></section></div></body>
+</body>
 </html>

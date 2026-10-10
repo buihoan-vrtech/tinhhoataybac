@@ -27,6 +27,12 @@ public class UserService implements UserDetailsService {
                          String password,
                          String phone) {
 
+        return register(fullName, email, password, phone, "");
+    }
+
+    public User register(String fullName, String email, String password, String phone, String address) {
+        if (address != null && address.length() > 500) throw new IllegalStateException("Địa chỉ tối đa 500 ký tự.");
+        email = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
         if(fullName==null||fullName.isBlank()||fullName.length()>255||email==null||!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")||password==null||password.length()<8||password.length()>72)throw new IllegalStateException("Nhập tên, email hợp lệ và mật khẩu từ 8 đến 72 ký tự.");
         email = email.trim().toLowerCase(java.util.Locale.ROOT);
 
@@ -52,6 +58,7 @@ public class UserService implements UserDetailsService {
                         : null
         );
 
+        user.setAddress(address == null ? null : address.trim());
         user.setRole("USER");
         user.setEnabled(true);
 

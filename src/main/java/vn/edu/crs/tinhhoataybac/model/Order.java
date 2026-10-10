@@ -18,6 +18,15 @@ public class Order {
     @Column(nullable = false)
     private String customerName;
 
+    private LocalDateTime cancelledAt;
+
+    private Boolean refunded;
+
+    private LocalDateTime refundedAt;
+
+    @Column(length = 500)
+    private String cancelReason;
+
     @Column(nullable = false)
     private String phone;
 
@@ -186,6 +195,37 @@ public class Order {
     public List<OrderDetail> getOrderDetails() {
         return orderDetails;
     }
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public Boolean getRefunded() {
+        return refunded;
+    }
+
+    public void setRefunded(Boolean refunded) {
+        this.refunded = refunded;
+    }
+
+    public LocalDateTime getRefundedAt() {
+        return refundedAt;
+    }
+
+    public void setRefundedAt(LocalDateTime refundedAt) {
+        this.refundedAt = refundedAt;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
@@ -226,4 +266,12 @@ public class Order {
  public String getOrderStatusLabel(){return switch(orderStatus==null?"":orderStatus){case "PENDING"->"Chờ xác nhận";case "CONFIRMED"->"Đã xác nhận";case "SHIPPING"->"Đang giao hàng";case "COMPLETED"->"Đã giao hàng";case "CANCELLED"->"Đã hủy";default->"Chưa xác định";};}
  public String getPaymentStatusLabel(){return switch(paymentStatus==null?"":paymentStatus){case "PENDING"->"Chờ thanh toán";case "UNPAID"->"Chưa thanh toán";case "PAID"->"Đã thanh toán";case "REFUNDED"->"Đã hoàn tiền";default->"Chưa xác định";};}
  public String getPaymentMethodLabel(){return switch(paymentMethod==null?"":paymentMethod){case "QR"->"Chuyển khoản";case "COD"->"Thanh toán khi nhận hàng";case "WALLET"->"Ví Tinh Hoa";default->"Chưa xác định";};}
+ @Column(length=100) private String giftWrapName;
+ private BigDecimal giftWrapFee;
+ @Column(columnDefinition="TEXT") private String giftMessage;
+ private Boolean hidePrices=false;
+ public String getGiftWrapName(){return giftWrapName;} public void setGiftWrapName(String v){giftWrapName=v;}
+ public BigDecimal getGiftWrapFee(){return giftWrapFee;} public void setGiftWrapFee(BigDecimal v){giftWrapFee=v;}
+ public String getGiftMessage(){return giftMessage;} public void setGiftMessage(String v){giftMessage=v;}
+ public Boolean getHidePrices(){return Boolean.TRUE.equals(hidePrices);} public void setHidePrices(Boolean v){hidePrices=v;}
 }

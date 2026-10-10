@@ -11,9 +11,9 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
-</head>
+<link rel="stylesheet" href="/css/account.css?v=20261010"></head>
 
-<body>
+<body class="account-area">
 
 <div th:replace="~{fragments/header :: header}"></div>
 
@@ -61,22 +61,7 @@
                 </div>
 
 
-                <nav class="account-menu">
-
-                    <a th:href="@{/account}">
-                        👤 Thông tin tài khoản
-                    </a>
-
-                    <a th:href="@{/account/orders}"
-                       class="active">
-                        📦 Đơn hàng của tôi
-                    </a>
-
-                    <a th:href="@{/wallet}">
-                        💳 Ví Tinh Hoa
-                    </a>
-
-                </nav>
+                <nav class="account-menu"><a href="/account" class="">Tổng quan</a><a href="/account/profile">Hồ sơ cá nhân</a><a href="/account/orders" class="active">Đơn hàng của tôi</a><a href="/account/addresses">Địa chỉ nhận hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav>
 
             </aside>
 
@@ -241,9 +226,9 @@
                                         <span th:text="${#numbers.formatDecimal(
                                         order.totalAmount,
                                         0,
-                                        'COMMA',
+                                        'POINT',
                                         0,
-                                        'POINT'
+                                        'COMMA'
                                         )}">
                                             0
                                         </span>

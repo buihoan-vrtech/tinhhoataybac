@@ -59,6 +59,8 @@ public class PaymentStatusController {
                         "paymentStatus",
                         order.getPaymentStatus(),
 
+                        "orderStatus", order.getOrderStatus(),
+                        "expiresAt", order.getPaymentExpiresAt() == null ? "" : order.getPaymentExpiresAt().atZone(java.time.ZoneId.systemDefault()).toInstant().toString(),
                         "paid",
                         paid
                 )

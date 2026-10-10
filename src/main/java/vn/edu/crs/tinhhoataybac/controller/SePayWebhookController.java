@@ -14,6 +14,12 @@ import java.util.Map;
 @RequestMapping("/api/sepay")
 public class SePayWebhookController {
 
+    @org.springframework.beans.factory.annotation.Value("${sepay.webhook-secret:}")
+    private String webhookSecret;
+
+    @org.springframework.beans.factory.annotation.Value("${payment.qr.account-no:}")
+    private String receivingAccount;
+
     private final OrderService orderService;
 
     private final SePayTransactionRepository
@@ -33,8 +39,13 @@ public class SePayWebhookController {
 
     @PostMapping("/webhook")
     public ResponseEntity<Map<String, Boolean>> webhook(
+            @RequestHeader(value="Authorization", required=false) String authorization,
             @RequestBody SePayWebhookRequest request) {
 
+        String expected = "Apikey " + webhookSecret;
+        if (webhookSecret == null || webhookSecret.isBlank() || authorization == null || !java.security.MessageDigest.isEqual(expected.getBytes(java.nio.charset.StandardCharsets.UTF_8), authorization.getBytes(java.nio.charset.StandardCharsets.UTF_8))) return ResponseEntity.status(401).body(Map.of("success", false));
+        if (receivingAccount == null || receivingAccount.isBlank() || !receivingAccount.equals(request.getAccountNumber())) return ResponseEntity.badRequest().body(Map.of("success", false));
+        if (request.getTransferAmount() == null || request.getTransferAmount().signum() <= 0 || request.getId() == null || request.getId() <= 0) return ResponseEntity.badRequest().body(Map.of("success", false));
         try {
 
             /*
@@ -82,8 +93,12 @@ public class SePayWebhookController {
              *
              * THB15
              */
-            String paymentCode =
-                    request.getCode();
+            String paymentCode = request.getCode();
+            if (paymentCode == null || paymentCode.isBlank()) {
+                var match=java.util.regex.Pattern.compile("(?i)(?<![A-Z0-9])THB[1-9][0-9]{0,18}(?![A-Z0-9])").matcher(request.getContent() == null ? "" : request.getContent());
+                if (match.find()) paymentCode=match.group();
+            }
+            if (paymentCode != null) paymentCode=paymentCode.trim();
 
 
             if (paymentCode == null
@@ -100,7 +115,7 @@ public class SePayWebhookController {
              */
             if (!paymentCode
                     .toUpperCase()
-                    .startsWith("THB")) {
+                    .matches("THB[1-9][0-9]{0,18}")) {
 
                 return ResponseEntity.ok(
                         Map.of("success", true)

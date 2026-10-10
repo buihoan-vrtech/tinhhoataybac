@@ -449,7 +449,7 @@
                  th:each="product : ${products}">
 
 
-                <div class="product-image">
+                <div class="product-image"><button class="favorite-button" type="button" th:attr="data-favorite-id=${product.id},data-product-name=${product.name}" th:aria-label="${'Lưu yêu thích ' + product.name}" aria-pressed="false">♡</button>
 
 
                     <span class="product-badge"
@@ -674,7 +674,7 @@
 
 
 <!-- FOOTER DÙNG CHUNG -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/saved-products :: recent}"></div><div th:replace="~{fragments/footer :: footer}"></div>
 
 
 <script th:src="@{/js/main.js}"></script>

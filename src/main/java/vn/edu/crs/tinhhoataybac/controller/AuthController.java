@@ -35,13 +35,18 @@ public class AuthController {
     public String registerUser(
             @RequestParam String fullName,
             @RequestParam String email,
-            @RequestParam String phone,
+            @RequestParam(defaultValue = "") String phone,
             @RequestParam String password,
             @RequestParam String confirmPassword,
+            @RequestParam(defaultValue = "") String address,
+            @RequestParam(defaultValue = "false") boolean termsAccepted,
             Model model) {
 
         try {
 
+            if (!termsAccepted) throw new IllegalStateException("Vui lòng đồng ý điều khoản sử dụng và chính sách bảo mật.");
+            if (address.length() > 500) throw new IllegalStateException("Địa chỉ tối đa 500 ký tự.");
+            if (!phone.isBlank() && !phone.replaceAll("[\\s().-]", "").matches("(?:0|\\+84)[0-9]{9,10}")) throw new IllegalStateException("Số điện thoại Việt Nam chưa hợp lệ.");
             if (fullName == null
                     || fullName.trim().isEmpty()) {
 
@@ -59,10 +64,10 @@ public class AuthController {
             }
 
             if (password == null
-                    || password.length() < 6) {
+                    || password.length() < 8 || password.length() > 72) {
 
                 throw new IllegalStateException(
-                        "Mật khẩu phải có ít nhất 6 ký tự."
+                        "Mật khẩu phải có từ 8 đến 72 ký tự."
                 );
             }
 
@@ -77,16 +82,21 @@ public class AuthController {
                     fullName,
                     email,
                     password,
-                    phone
+                    phone, address
             );
 
             return "redirect:/login?registered";
 
         } catch (Exception e) {
+            String registrationError = e instanceof IllegalStateException
+                ? e.getMessage() : "Không thể tạo tài khoản lúc này. Vui lòng thử lại.";
+            if (e instanceof org.springframework.dao.DataIntegrityViolationException && userService.findByEmail(email) != null)
+                registrationError = "Email này đã được sử dụng.";
+
 
             model.addAttribute(
                     "error",
-                    e.getMessage()
+                    registrationError
             );
 
             model.addAttribute(
@@ -104,6 +114,7 @@ public class AuthController {
                     phone
             );
 
+            model.addAttribute("address", address);
             return "register";
         }
     }

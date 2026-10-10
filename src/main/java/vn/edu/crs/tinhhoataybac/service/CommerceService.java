@@ -10,6 +10,7 @@ import vn.edu.crs.tinhhoataybac.repository.*;
 
 @Service
 public class CommerceService {
+  private final GiftWrapService gifts;
   private final ShipmentEventRepository shipmentEvents;
   private final OrderService orders;
   private final OrderRepository orderRepo;
@@ -33,7 +34,8 @@ public class CommerceService {
       OrderStatusHistoryRepository histories,
       CustomerNotificationRepository notifications,
       OrderServiceRequestRepository requests,
-      ShipmentEventRepository shipmentEvents) {
+      ShipmentEventRepository shipmentEvents,GiftWrapService gifts) {
+    this.gifts=gifts;
     this.shipmentEvents = shipmentEvents;
     this.orders = orders;
     this.orderRepo = orderRepo;
@@ -68,6 +70,23 @@ public class CommerceService {
       List<CartItem> items,
       String shipping,
       String code) {
+    return checkout(user,name,phone,address,note,payment,items,shipping,code,null,null,false);
+  }
+
+  @Transactional
+  public Order checkout(
+      User user,
+      String name,
+      String phone,
+      String address,
+      String note,
+      String payment,
+      List<CartItem> items,
+      String shipping,
+      String code, Long giftWrapId, String giftMessage, boolean hidePrices) {
+    var wrap=gifts.selected(giftWrapId);
+    var giftFee=wrap==null?BigDecimal.ZERO:wrap.getPrice();
+    String greeting=GiftWrapService.message(giftMessage);
     if (name == null
         || name.isBlank()
         || name.length() > 255
@@ -99,7 +118,8 @@ public class CommerceService {
     order.setShippingFee(fee);
     order.setShippingMethod(shipping);
     order.setDiscount(discount);
-    order.setTotalAmount(subtotal.add(fee).subtract(discount));
+    order.setGiftWrapName(wrap==null?null:wrap.getName());order.setGiftWrapFee(giftFee);order.setGiftMessage(greeting);order.setHidePrices(hidePrices);
+    order.setTotalAmount(subtotal.add(fee).add(giftFee).subtract(discount));
     if ("QR".equals(payment)) order.setPaymentExpiresAt(LocalDateTime.now().plusMinutes(5));
     orderRepo.save(order);
     if ("WALLET".equals(payment)) {
@@ -165,7 +185,8 @@ public class CommerceService {
               .sorted(Comparator.comparing(d -> d.getProduct().getId()))
               .toList()) {
         Product p = products.lockById(d.getProduct().getId()).orElseThrow();
-        p.setStock((p.getStock() == null ? 0 : p.getStock()) + d.getQuantity());
+        if(d.getBatch()!=null){var b=p.getBatches().stream().filter(v->v.getId().equals(d.getBatch().getId())).findFirst().orElseThrow();b.setRemainingQuantity(Math.round((b.getRemainingQuantity()+d.getQuantity())*100)/100.0);}
+        else if(!p.getBatchTracked())p.setStock((p.getStock() == null ? 0 : p.getStock()) + d.getQuantity());
         products.save(p);
       }
       refund(o);
@@ -289,6 +310,10 @@ public class CommerceService {
   }
 
   public Map<String, BigDecimal> quote(List<CartItem> items, String shipping, String code) {
+    return quote(items,shipping,code,null);
+  }
+  public Map<String, BigDecimal> quote(List<CartItem> items,String shipping,String code,Long giftWrapId){
+    BigDecimal giftFee=gifts.fee(giftWrapId);
     if (items == null || items.isEmpty()) throw new IllegalStateException("Giỏ hàng đang trống.");
     BigDecimal subtotal = BigDecimal.ZERO, fee = shippingFee(shipping), discount = BigDecimal.ZERO;
     for (CartItem item : items) {
@@ -319,8 +344,9 @@ public class CommerceService {
         fee,
         "discount",
         discount,
+        "giftWrapFee",giftFee,
         "total",
-        subtotal.add(fee).subtract(discount));
+        subtotal.add(fee).add(giftFee).subtract(discount));
   }
 
   @Transactional

@@ -86,6 +86,9 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
+                .requestMatchers(org.springframework.http.HttpMethod.GET,"/combos").permitAll()
+                .requestMatchers("/combos/**").authenticated()
+
 
                 /*
                  * ADMIN

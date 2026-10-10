@@ -16,17 +16,14 @@
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
-<link rel="stylesheet" href="/css/features.css"></head>
+<link rel="stylesheet" href="/css/features.css"><link rel="stylesheet" href="/css/account.css?v=20261010"></head>
 
-<body>
-<div class="feature-main"><nav class="feature-nav"><a href="/account/profile">Hồ sơ</a><a href="/account/addresses">Địa chỉ</a><a href="/account/orders">Đơn hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
-
-
+<body class="account-area">
 <div th:replace="~{fragments/header :: header}">
 </div>
 
 
-<section class="account-page">
+<section class="account-page"><div class="container"><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
 
     <div class="container">
 
@@ -90,32 +87,7 @@
 
 
 
-                <nav class="account-menu">
-
-
-                    <a th:href="@{/account}"
-                       class="active">
-
-                        👤 Thông tin tài khoản
-
-                    </a>
-
-
-                    <a th:href="@{/account/orders}">
-
-                        📦 Đơn hàng của tôi
-
-                    </a>
-
-
-                    <a th:href="@{/wallet}">
-
-                        💳 Ví Tinh Hoa
-
-                    </a>
-
-
-                </nav>
+                <nav class="account-menu"><a href="/account" class="active">Tổng quan</a><a href="/account/profile">Hồ sơ cá nhân</a><a href="/account/orders" class="">Đơn hàng của tôi</a><a href="/account/addresses">Địa chỉ nhận hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav>
 
 
             </aside>
@@ -132,9 +104,7 @@
                 <div class="account-card">
 
 
-                    <h2>
-                        Thông tin cá nhân
-                    </h2>
+                    <div class="account-recent-heading"><h2>Thông tin cá nhân</h2><a class="account-edit" href="/account/profile">Chỉnh sửa →</a></div>
 
 
                     <div class="account-info-grid">
@@ -189,10 +159,10 @@
                         <div>
 
                             <span>
-                                Vai trò
+                                Loại tài khoản
                             </span>
 
-                            <strong th:text="${user.role}">
+                            <strong th:text="${user.role == 'ADMIN' ? 'Quản trị viên' : 'Khách hàng'}">
                                 USER
                             </strong>
 
@@ -223,9 +193,9 @@
                             <span th:text="${#numbers.formatDecimal(
                             wallet.balance,
                             0,
-                            'COMMA',
+                            'POINT',
                             0,
-                            'POINT')}">
+                            'COMMA')}">
 
                                 0
 
@@ -281,7 +251,7 @@
                     <div th:if="${recentOrders == null || recentOrders.isEmpty()}"
                          class="account-no-orders">
 
-                        Bạn chưa có đơn hàng nào.
+                        Bạn chưa có đơn hàng nào. <a href="/products">Khám phá đặc sản →</a>
 
                     </div>
 
@@ -318,7 +288,7 @@
 
                             <div>
 
-                                <span th:text="${order.paymentStatusLabel}">
+                                <span class="account-badge" th:classappend="${order.paymentStatus == 'PAID' ? 'paid' : 'pending'}" th:text="${order.paymentStatusLabel}">
                                     PAID
                                 </span>
 
@@ -328,9 +298,9 @@
                                     <span th:text="${#numbers.formatDecimal(
                                     order.totalAmount,
                                     0,
-                                    'COMMA',
+                                    'POINT',
                                     0,
-                                    'POINT')}">
+                                    'COMMA')}">
 
                                         0
 

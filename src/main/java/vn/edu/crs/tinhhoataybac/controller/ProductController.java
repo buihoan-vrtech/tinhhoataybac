@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.crs.tinhhoataybac.model.Product;
 import vn.edu.crs.tinhhoataybac.repository.*;
+import vn.edu.crs.tinhhoataybac.service.CatalogBrowser;
 
 @Controller
 public class ProductController {
@@ -31,9 +32,15 @@ public class ProductController {
     if (p == null) return "redirect:/products";
     var list = reviews.findByProductIdOrderByCreatedAtDesc(id);
     m.addAttribute("product", p);
+    m.addAttribute("variants",p.getFamilyCode()==null||p.getFamilyCode().isBlank()?List.of(p):products.findByFamilyCodeOrderByIdAsc(p.getFamilyCode()));
     m.addAttribute("reviews", list);
     m.addAttribute("ratingAverage", list.stream().mapToInt(r -> r.getRating()).average().orElse(0));
     m.addAttribute("gallery", images.findByProductIdOrderByIdAsc(id));
+    m.addAttribute("relatedProducts", p.getCategory() == null ? List.of() :
+        products.findByCategoryId(p.getCategory().getId()).stream()
+            .filter(other -> !id.equals(other.getId()))
+            .filter(other -> other.getPrice() != null && other.getStock() != null && other.getStock() > 0)
+            .limit(4).toList());
     return "product-detail";
   }
 
@@ -42,30 +49,33 @@ public class ProductController {
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(defaultValue = "newest") String sort,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(defaultValue = "false") boolean inStock,
+      @RequestParam(defaultValue = "0") int page,
       jakarta.servlet.http.HttpServletRequest request,
       Model m) {
-    String q = keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT);
-    var stream =
-        products.findAll().stream()
-            .filter(p -> q.isEmpty() || p.getName().toLowerCase(Locale.ROOT).contains(q))
-            .filter(
-                p ->
-                    categoryId == null
-                        || (p.getCategory() != null && categoryId.equals(p.getCategory().getId())));
-    if (request.getRequestURI().equals("/khuyen-mai"))
-      stream = stream.filter(p -> !p.getEffectivePrice().equals(p.getPrice()));
-    Comparator<Product> c =
-        switch (sort) {
-          case "price_asc" -> Comparator.comparing(Product::getEffectivePrice);
-          case "price_desc" -> Comparator.comparing(Product::getEffectivePrice).reversed();
-          case "name" -> Comparator.comparing(Product::getName);
-          default -> Comparator.comparing(Product::getId).reversed();
-        };
-    m.addAttribute("products", stream.sorted(c).toList());
+    boolean offers = request.getRequestURI().equals("/khuyen-mai");
+    var result = CatalogBrowser.browse(products.findAll(), keyword, categoryId,
+        minPrice, maxPrice, inStock, offers, sort, page);
+    m.addAttribute("products", result.items());
+    m.addAttribute("totalProducts", result.total());
+    m.addAttribute("currentPage", result.page());
+    m.addAttribute("totalPages", result.pages());
+    m.addAttribute("firstProduct", result.first());
+    m.addAttribute("lastProduct", result.last());
+    m.addAttribute("minPrice", CatalogBrowser.priceBound(minPrice));
+    m.addAttribute("maxPrice", CatalogBrowser.priceBound(maxPrice));
+    m.addAttribute("inStock", inStock);
+    m.addAttribute("catalogPath", offers ? "/khuyen-mai" : "/products");
+    m.addAttribute("catalogTitle", offers ? "Sản phẩm khuyến mãi" : categoryId == null
+        ? "Tất cả sản phẩm" : categories.findById(categoryId).map(c -> c.getName()).orElse("Sản phẩm"));
+    m.addAttribute("filterError", minPrice != null && maxPrice != null && minPrice > maxPrice
+        ? "Giá từ phải nhỏ hơn hoặc bằng giá đến." : null);
     m.addAttribute("categories", categories.findAll());
     m.addAttribute("keyword", keyword);
     m.addAttribute("categoryId", categoryId);
-    m.addAttribute("sort", sort);
+    m.addAttribute("sort", CatalogBrowser.sortKey(sort));
     return "products";
   }
 
@@ -73,7 +83,9 @@ public class ProductController {
   @ResponseBody
   public List<Map<String, Object>> suggestions(@RequestParam(defaultValue = "") String keyword) {
     if (keyword.trim().length() < 2) return List.of();
-    return products.findByNameContainingIgnoreCase(keyword.trim()).stream()
+    return products.findAll().stream()
+        .filter(p -> CatalogBrowser.normalize(p.getName()).contains(CatalogBrowser.normalize(keyword)))
+        .filter(p -> p.getPrice() != null)
         .limit(8)
         .map(
             p ->

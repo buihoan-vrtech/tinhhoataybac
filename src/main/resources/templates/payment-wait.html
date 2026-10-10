@@ -62,7 +62,7 @@
             </div>
 
 
-            <p class="payment-redirect-text">
+            <p id="payment-status-message" role="status" aria-live="polite" class="payment-redirect-text">
 
                 Không cần tải lại trang.
                 Hệ thống sẽ tự cập nhật.
@@ -70,9 +70,8 @@
             </p>
 
 
+            <p><a th:href="@{/account/orders/{id}(id=${order.id})}">Xem đơn hàng</a> · <a href="/account/orders">Danh sách đơn hàng</a></p>
         </div>
-
-
 
         <div class="payment-success-box"
              id="successBox"
@@ -116,80 +115,20 @@
 
 
 <script th:inline="javascript">
-
-    const orderId =
-        /*[[${order.id}]]*/ 0;
-
-
-    let timer = null;
-
-
-    async function checkPayment() {
-
-        try {
-
-            const response =
-                await fetch(
-                    "/api/payment/status/"
-                    + orderId,
-                    {
-                        cache: "no-store"
-                    }
-                );
-
-
-            if (!response.ok) {
-                return;
-            }
-
-
-            const data =
-                await response.json();
-
-
-            if (data.paid === true) {
-
-                clearInterval(timer);
-
-
-                document
-                    .getElementById("waitingBox")
-                    .style.display = "none";
-
-
-                document
-                    .getElementById("successBox")
-                    .style.display = "block";
-
-
-                setTimeout(
-                    function () {
-
-                        window.location.href =
-                            "/order-success/"
-                            + orderId;
-
-                    },
-                    1800
-                );
-            }
-
-        } catch (e) {
-
-            console.log(e);
-        }
-    }
-
-
-    checkPayment();
-
-
-    timer =
-        setInterval(
-            checkPayment,
-            2000
-        );
-
+const orderId=/*[[${order.id}]]*/0;
+let timer,checking=false,stopped=false,attempts=0;
+const message=document.getElementById('payment-status-message');
+async function checkPayment(){
+ if(checking||stopped)return;checking=true;const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
+ try{const response=await fetch('/api/payment/status/'+orderId,{cache:'no-store',signal:controller.signal});
+ if(response.redirected||response.status===401||response.status===403){stopped=true;message.textContent='Phiên đăng nhập đã hết hạn. Đăng nhập lại để xem đơn hàng.';return;}
+ if(!response.ok)throw Error();const data=await response.json();
+ if(data.paid){stopped=true;document.getElementById('waitingBox').style.display='none';document.getElementById('successBox').style.display='block';setTimeout(()=>location.href='/order-success/'+orderId,1800);return;}
+ if(data.orderStatus==='CANCELLED'||data.paymentStatus==='REFUNDED'){stopped=true;message.textContent='Đơn đã hủy hoặc hoàn tiền. Xem chi tiết đơn hàng để được hỗ trợ.';return;}
+ if(data.expiresAt&&Date.parse(data.expiresAt)<=Date.now()){stopped=true;message.textContent='Đã hết thời gian thanh toán. Nếu đã chuyển tiền, vui lòng liên hệ hỗ trợ và cung cấp mã đơn.';return;}
+ message.textContent='Đang chờ xác nhận từ SePay. Không cần tải lại trang.';
+ }catch(e){message.textContent='Chưa kết nối được để kiểm tra. Hệ thống sẽ thử lại; bạn có thể xem trạng thái trong đơn hàng.';}finally{clearTimeout(timeout);checking=false;if(!stopped&&++attempts<150)timer=setTimeout(checkPayment,3000);else if(!stopped){stopped=true;message.textContent='Chưa nhận xác nhận. Vui lòng kiểm tra trong đơn hàng hoặc liên hệ hỗ trợ trước khi thanh toán lại.';}}}
+checkPayment();window.addEventListener('pagehide',()=>{stopped=true;clearTimeout(timer);});
 </script>
 
 

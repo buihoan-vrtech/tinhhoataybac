@@ -311,6 +311,8 @@ public class SePayService {
     }
 
 
+    public boolean isSandbox() { return checkoutUrl != null && checkoutUrl.startsWith("https://pay-sandbox.sepay.vn/"); }
+
     public String getCheckoutUrl() {
         return checkoutUrl;
     }

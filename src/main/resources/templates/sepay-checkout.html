@@ -41,8 +41,7 @@
 
 
             <p>
-                Bạn sẽ được chuyển tới
-                SePay Sandbox để quét QR.
+                Bạn sẽ được chuyển tới SePay để quét QR. Kiểm tra số tiền và mã đơn trước khi thanh toán.
             </p>
 
 
@@ -91,7 +90,7 @@
             </div>
 
 
-            <form th:action="${checkoutUrl}"
+            <form th:action="${checkoutUrl}" th:attr="data-sepay-checkout=true"
                   method="post">
 
 
@@ -118,7 +117,7 @@
                 font-size:12px;
             ">
 
-                Sandbox không sử dụng tiền thật.
+                <span th:if="${sandbox}">Đang thử nghiệm Sandbox · Không chuyển tiền thật.</span>
 
             </p>
 

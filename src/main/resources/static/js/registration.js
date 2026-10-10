@@ -1,0 +1,7 @@
+document.addEventListener('DOMContentLoaded',()=>{
+ const form=document.querySelector('#register-form'); if(!form)return;
+ const pass=form.querySelector('#registerPassword'), confirm=form.querySelector('#confirmPassword');
+ const update=()=>{let score=pass.value.length>=8?1:0; if(score){score+=Number(/[a-z]/.test(pass.value)&&/[A-Z]/.test(pass.value))+Number(/\d/.test(pass.value))+Number(/[^\w\s]/.test(pass.value));} document.querySelector('#password-strength').value=score; document.querySelector('#password-help').textContent=pass.value?['Chưa đủ 8 ký tự','Độ mạnh: cơ bản','Độ mạnh: khá','Độ mạnh: tốt','Độ mạnh: mạnh'][score]:'Dùng ít nhất 8 ký tự; kết hợp chữ, số và ký hiệu.'; const mismatch=confirm.value&&confirm.value!==pass.value;confirm.setCustomValidity(mismatch?'Mật khẩu nhập lại không khớp.':'');document.querySelector('#confirm-help').textContent=confirm.value?(mismatch?'Mật khẩu nhập lại chưa khớp.':'Mật khẩu đã khớp.') : '';}; pass.addEventListener('input',update);confirm.addEventListener('input',update);
+ document.querySelectorAll('[data-password-toggle]').forEach(button=>button.addEventListener('click',()=>{const show=pass.type==='password';pass.type=show?'text':'password';confirm.type=pass.type;button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'Ẩn mật khẩu':'Hiện mật khẩu');}));
+ form.addEventListener('submit',()=>{if(form.checkValidity()){const b=form.querySelector('[type=submit]');b.disabled=true;b.querySelector('span').textContent='Đang tạo tài khoản…';}});
+});

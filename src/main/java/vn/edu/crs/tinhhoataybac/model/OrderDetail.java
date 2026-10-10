@@ -79,4 +79,12 @@ public class OrderDetail {
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
+ @ManyToOne private ProductBatch batch;
+ private String batchCodeSnapshot;
+ private java.time.LocalDate expirySnapshot;
+ private String variantSnapshot;
+ public ProductBatch getBatch(){return batch;} public void setBatch(ProductBatch b){batch=b;batchCodeSnapshot=b==null?null:b.getBatchCode();expirySnapshot=b==null?null:b.getExpiresOn();}
+ public String getBatchCodeSnapshot(){return batchCodeSnapshot;}
+ public java.time.LocalDate getExpirySnapshot(){return expirySnapshot;}
+ public String getVariantSnapshot(){return variantSnapshot;} public void setVariantSnapshot(String v){variantSnapshot=v;}
 }

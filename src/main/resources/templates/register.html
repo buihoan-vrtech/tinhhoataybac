@@ -12,7 +12,7 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
-</head>
+<link rel="stylesheet" href="/css/registration.css"></head>
 
 <body>
 
@@ -73,12 +73,12 @@
 
         <form th:action="@{/register}"
               method="post"
-              class="auth-v2-form">
+              id="register-form" class="auth-v2-form">
 
 
             <div class="auth-v2-field">
 
-                <label>
+                <label for="fullName">
                     Họ và tên
                 </label>
 
@@ -89,7 +89,7 @@
                     </div>
 
                     <input type="text"
-                           name="fullName"
+                           id="fullName" autocomplete="name" maxlength="255" name="fullName"
                            required
                            th:value="${fullName}"
                            placeholder="Nguyễn Văn A">
@@ -101,7 +101,7 @@
 
             <div class="auth-v2-field">
 
-                <label>
+                <label for="email">
                     Email
                 </label>
 
@@ -112,7 +112,7 @@
                     </div>
 
                     <input type="email"
-                           name="email"
+                           id="email" autocomplete="email" maxlength="255" name="email"
                            required
                            th:value="${email}"
                            placeholder="example@gmail.com">
@@ -124,7 +124,7 @@
 
             <div class="auth-v2-field">
 
-                <label>
+                <label for="phone">
                     Số điện thoại
                 </label>
 
@@ -135,7 +135,7 @@
                     </div>
 
                     <input type="tel"
-                           name="phone"
+                           id="phone" autocomplete="tel" maxlength="20" name="phone"
                            th:value="${phone}"
                            placeholder="0912345678">
 
@@ -146,7 +146,7 @@
 
             <div class="auth-v2-field">
 
-                <label>
+                <label for="registerPassword">
                     Mật khẩu
                 </label>
 
@@ -157,15 +157,16 @@
                     </div>
 
                     <input type="password"
-                           name="password"
+                           autocomplete="new-password" name="password"
                            id="registerPassword"
                            required
-                           minlength="6"
-                           placeholder="Ít nhất 6 ký tự">
+                           minlength="8"
+                           maxlength="72"
+                           placeholder="Từ 8 đến 72 ký tự">
 
                     <button type="button"
                             class="auth-v2-eye"
-                            onclick="toggleRegisterPassword()">
+                            aria-label="Hiện mật khẩu" aria-pressed="false" data-password-toggle="registerPassword">
 
                         👁
 
@@ -178,7 +179,7 @@
 
             <div class="auth-v2-field">
 
-                <label>
+                <label for="confirmPassword">
                     Xác nhận mật khẩu
                 </label>
 
@@ -189,9 +190,10 @@
                     </div>
 
                     <input type="password"
-                           name="confirmPassword"
+                           id="confirmPassword" autocomplete="new-password" name="confirmPassword"
                            required
-                           minlength="6"
+                           minlength="8"
+                           maxlength="72"
                            placeholder="Nhập lại mật khẩu">
 
                 </div>
@@ -199,18 +201,19 @@
             </div>
 
 
-            <label class="auth-v2-agreement">
+            <div class="registration-feedback"><meter id="password-strength" min="0" max="4" value="0" aria-label="Độ mạnh mật khẩu"></meter><p id="password-help" aria-live="polite">Dùng ít nhất 8 ký tự; kết hợp chữ, số và ký hiệu để tăng độ mạnh.</p><p id="confirm-help" aria-live="polite"></p></div>
+<div class="auth-v2-field"><label for="registration-address">Địa chỉ nhận hàng <small>(tùy chọn)</small></label><textarea id="registration-address" name="address" data-address-search autocomplete="street-address" maxlength="500" rows="3" th:text="${address}" placeholder="Số nhà, tên đường, phường/xã, tỉnh/thành"></textarea><p class="field-hint">Bạn có thể bổ sung hoặc thay đổi khi đặt hàng.</p></div>
+<label class="auth-v2-agreement">
 
-                <input type="checkbox"
-                       required>
+                <input type="checkbox" name="termsAccepted" value="true" required>
 
                 <span>
                     Tôi đồng ý với
-                    <a href="#">
+                    <a th:href="@{/dieu-khoan-dich-vu}">
                         Điều khoản sử dụng
                     </a>
                     và
-                    <a href="#">
+                    <a th:href="@{/chinh-sach-bao-mat}">
                         Chính sách bảo mật
                     </a>
                 </span>
@@ -273,22 +276,7 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 
-<script>
-
-    function toggleRegisterPassword() {
-
-        const input =
-            document.getElementById("registerPassword");
-
-        if (input.type === "password") {
-            input.type = "text";
-        } else {
-            input.type = "password";
-        }
-
-    }
-
-</script>
+<script src="/js/registration.js"></script><script src="/js/address-search.js"></script>
 
 
 </body>

@@ -11,6 +11,7 @@ import vn.edu.crs.tinhhoataybac.service.*;
 
 @Controller
 public class CheckoutController {
+  private final GiftWrapService gifts;
   private final CartService cart;
   private final CommerceService commerce;
   private final UserService users;
@@ -24,7 +25,8 @@ public class CheckoutController {
       UserService users,
       WalletService wallets,
       OrderRepository orders,
-      UserAddressRepository addresses) {
+      UserAddressRepository addresses,GiftWrapService gifts) {
+    this.gifts=gifts;
     this.cart = cart;
     this.commerce = commerce;
     this.users = users;
@@ -34,6 +36,7 @@ public class CheckoutController {
   }
 
   private void fill(Model m, HttpSession s, User u) {
+    m.addAttribute("giftWrapOptions",gifts.active());
     m.addAttribute("cartItems", cart.getCart(s));
     m.addAttribute("cartTotal", cart.getTotal(s));
     m.addAttribute("user", u);
@@ -58,6 +61,9 @@ public class CheckoutController {
       @RequestParam String paymentMethod,
       @RequestParam(defaultValue = "standard") String shippingMethod,
       @RequestParam(required = false) String voucherCode,
+      @RequestParam(required = false) Long giftWrapId,
+      @RequestParam(required=false) String giftMessage,
+      @RequestParam(defaultValue="false") boolean hidePrices,
       HttpSession s,
       Model m,
       Authentication a) {
@@ -73,13 +79,16 @@ public class CheckoutController {
               paymentMethod,
               cart.getCart(s),
               shippingMethod,
-              voucherCode);
+              voucherCode,giftWrapId,giftMessage,hidePrices);
       cart.clearCart(s);
       return "redirect:"
           + ("QR".equals(paymentMethod) ? "/payment/qr/" : "/order-success/")
           + o.getId();
     } catch (IllegalStateException | IllegalArgumentException e) {
       fill(m, s, u);
+      m.addAttribute("selectedGiftWrapId",giftWrapId);
+      m.addAttribute("giftMessageValue",giftMessage);
+      m.addAttribute("hidePricesSelected",hidePrices);
       m.addAttribute("error", e.getMessage());
       return "checkout";
     }
@@ -98,10 +107,11 @@ public class CheckoutController {
   public org.springframework.http.ResponseEntity<?> quote(
       @RequestParam(defaultValue = "standard") String shippingMethod,
       @RequestParam(required = false) String voucherCode,
+      @RequestParam(required = false) Long giftWrapId,
       HttpSession session) {
     try {
       return org.springframework.http.ResponseEntity.ok(
-          commerce.quote(cart.getCart(session), shippingMethod, voucherCode));
+          commerce.quote(cart.getCart(session), shippingMethod, voucherCode,giftWrapId));
     } catch (IllegalStateException e) {
       return org.springframework.http.ResponseEntity.badRequest()
           .body(java.util.Map.of("error", e.getMessage()));

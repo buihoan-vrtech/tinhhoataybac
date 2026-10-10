@@ -65,7 +65,11 @@ public class CatalogAdminController {
 
   @GetMapping("/products")
   public String products(@RequestParam(required = false) Long edit, Model m) {
-    m.addAttribute("products", products.findAll());
+    var catalog=products.findAll();
+    m.addAttribute("products", catalog);
+    var lots=catalog.stream().flatMap(p->p.getBatches().stream()).filter(b->b.getRemainingQuantity()>0).toList();
+    m.addAttribute("expiredBatchCount",lots.stream().filter(b->!b.getExpiresOn().isAfter(java.time.LocalDate.now())).count());
+    m.addAttribute("expiringBatchCount",lots.stream().filter(b->b.getExpiresOn().isAfter(java.time.LocalDate.now())&&!b.getExpiresOn().isAfter(java.time.LocalDate.now().plusDays(30))).count());
     m.addAttribute("categories", categories.findAll());
     m.addAttribute("product", edit == null ? new Product() : products.findById(edit).orElseThrow());
     m.addAttribute(
@@ -102,11 +106,26 @@ public class CatalogAdminController {
           form.getId() == null ? new Product() : products.findById(form.getId()).orElseThrow();
       p.setName(form.getName().trim());
       p.setPrice(form.getPrice());
-      p.setStock(form.getStock());
+      if(!p.getBatchTracked()) p.setStock(form.getStock());
       p.setImage(form.getImage());
       String uploaded = storage.save(imageFile);
       if (uploaded != null) p.setImage(uploaded);
       p.setDescription(form.getDescription());
+      p.setOrigin(form.getOrigin()==null?null:form.getOrigin().trim());
+      p.setProducer(form.getProducer()==null?null:form.getProducer().trim());
+      p.setIngredients(form.getIngredients()==null?null:form.getIngredients().trim());
+      p.setAllergenInfo(form.getAllergenInfo()==null?null:form.getAllergenInfo().trim());
+      p.setStorageInstructions(form.getStorageInstructions()==null?null:form.getStorageInstructions().trim());
+      p.setUsageInstructions(form.getUsageInstructions()==null?null:form.getUsageInstructions().trim());
+      p.setShelfLife(form.getShelfLife()==null?null:form.getShelfLife().trim());
+      p.setFamilyCode(form.getFamilyCode()==null?null:form.getFamilyCode().trim());
+      if(p.getFamilyCode()!=null&&!p.getFamilyCode().isBlank()){
+        p.setFamilyCode(p.getFamilyCode().toUpperCase(java.util.Locale.ROOT));
+        if(!p.getFamilyCode().matches("[A-Z0-9_-]{1,80}")||form.getVariantLabel()==null||form.getVariantLabel().isBlank())throw new IllegalStateException("Mã nhóm dùng chữ, số, dấu gạch; nhập tên quy cách cho nhóm.");
+        if(products.findByFamilyCodeOrderByIdAsc(p.getFamilyCode()).stream().filter(v->!java.util.Objects.equals(v.getId(),p.getId())).anyMatch(v->v.getVariantLabel()!=null&&v.getVariantLabel().equalsIgnoreCase(form.getVariantLabel().trim())))throw new IllegalStateException("Quy cách này đã có trong nhóm sản phẩm.");
+      }
+      p.setVariantLabel(form.getVariantLabel()==null?null:form.getVariantLabel().trim());
+
       p.setFeatured(Boolean.TRUE.equals(form.getFeatured()));
       p.setUnit(form.getUnit());
       p.setMinQuantity(form.getMinQuantity());

@@ -433,4 +433,31 @@ class CommerceFeaturesTests {
     assertEquals(
         0, wallets.getOrCreateWallet(customer).getBalance().compareTo(new BigDecimal("50000")));
   }
+
+  @Test
+  void registrationCreatesEnabledCustomerAndAcceptsOptionalPhone() throws Exception {
+    mvc.perform(post("/register").with(csrf()).param("fullName", "New Customer")
+        .param("email", " NEWUSER@Test.Local ").param("password", "TestPass123")
+        .param("confirmPassword", "TestPass123").param("role", "ADMIN"))
+        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login?registered"));
+    User created = users.findByEmail("newuser@test.local").orElseThrow();
+    assertEquals("USER", created.getRole());
+    assertTrue(created.getEnabled());
+    assertTrue(encoder.matches("TestPass123", created.getPassword()));
+    mvc.perform(post("/login").with(csrf()).param("email", "newuser@test.local")
+        .param("password", "TestPass123")).andExpect(org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated().withUsername("newuser@test.local"));
+  }
+
+  @Test
+  void registrationRejectsShortPasswordAndDuplicateEmailClearly() throws Exception {
+    mvc.perform(post("/register").with(csrf()).param("fullName", "New Customer")
+        .param("email", "newuser@test.local").param("password", "1234567")
+        .param("confirmPassword", "1234567"))
+        .andExpect(status().isOk()).andExpect(model().attribute("error", "Mật khẩu phải có từ 8 đến 72 ký tự."));
+    assertFalse(users.existsByEmail("newuser@test.local"));
+    mvc.perform(post("/register").with(csrf()).param("fullName", "New Customer")
+        .param("email", "CUSTOMER@test.local").param("password", "TestPass123")
+        .param("confirmPassword", "TestPass123"))
+        .andExpect(status().isOk()).andExpect(model().attribute("error", "Email này đã được sử dụng."));
+  }
 }

@@ -12,7 +12,7 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
-<link rel="stylesheet" href="/css/features.css"></head>
+<link rel="stylesheet" href="/css/features.css"><link rel="stylesheet" href="/css/gifts.css"></head>
 
 <body>
 <div class="feature-main"><nav class="feature-nav"><a href="/admin/dashboard">Tổng quan</a><a href="/admin/products">Sản phẩm</a><a href="/admin/categories">Danh mục</a><a href="/admin/orders">Đơn hàng</a><a href="/admin/vouchers">Voucher</a><a href="/admin/service-requests">Hủy / hoàn tiền</a><a href="/admin/wallets">Ví</a><a href="/admin/customers">Khách hàng</a><a href="/admin/reviews">Đánh giá</a></nav><p class="notice success" th:if="${success}" th:text="${success}"></p><p class="notice error" th:if="${error}" th:text="${error}"></p></div>
@@ -200,7 +200,7 @@
 
                         <strong th:text="${detail.product.name}">
                             Sản phẩm
-                        </strong>
+                        </strong><small th:if="${detail.variantSnapshot != null}" th:text="${detail.variantSnapshot}"></small><small th:if="${detail.batchCodeSnapshot != null}" th:text="${' · Lô: ' + detail.batchCodeSnapshot + ' · HSD: ' + detail.expirySnapshot}"></small>
 
                         <p style="
                             margin:5px 0 0 0;
@@ -414,7 +414,7 @@
 <section class="feature-card"><h2>Vận chuyển</h2><form class="feature-form" th:action="@{/admin/orders/{id}/shipment(id=${order.id})}" method="post"><label>Đơn vị vận chuyển<input name="carrier" th:value="${order.shippingCarrier}" required></label><label>Mã vận đơn<input name="trackingCode" th:value="${order.trackingCode}" required></label><label>Trạng thái giao hàng<select name="shipmentStatus"><option value="preparing">Chuẩn bị hàng</option><option value="handed_over">Đã bàn giao vận chuyển</option><option value="in_transit">Đang vận chuyển</option><option value="out_for_delivery">Đang giao đến khách</option><option value="delivery_failed">Giao chưa thành công</option><option value="returned">Đã hoàn về shop</option></select></label><label>Ngày giao dự kiến<input name="estimatedDeliveryAt" type="date" th:value="${order.estimatedDeliveryAt}"></label><label>Vị trí<input name="location" maxlength="150"></label><label>Ghi chú<input name="note" maxlength="1000"></label><button>Lưu vận chuyển</button></form></section><section class="feature-card"><h2>Lịch sử đơn hàng</h2><p th:if="${histories.isEmpty()}">Chưa có lịch sử.</p><div th:each="h:${histories}"><strong th:text="${h.status}"></strong><p th:text="${h.note}"></p><small th:text="${h.createdAt}"></small></div></section><section class="feature-card"><h2>Yêu cầu của khách hàng</h2><div th:each="r:${requests}"><strong th:text="${r.type + ' · ' + r.status}"></strong><p th:text="${r.reason}"></p><p th:text="${r.adminNote}"></p></div></section></section>
 
 
-<div th:replace="~{fragments/footer :: footer}"></div>
+<section class="gift-order" th:if="${order.giftWrapName != null or order.giftMessage != null or order.hidePrices}"><h3>Yêu cầu quà tặng</h3><p th:if="${order.giftWrapName != null}" th:text="${order.giftWrapName + ' · ' + #numbers.formatDecimal(order.giftWrapFee ?: 0,0,'POINT',0,'COMMA') + ' đ'}"></p><p th:if="${order.giftMessage != null}" th:text="${'Lời chúc: ' + order.giftMessage}"></p><p th:if="${order.hidePrices}">Không kèm giá trong kiện quà.</p></section><div th:replace="~{fragments/footer :: footer}"></div>
 
 <div class="feature-main"><section class="feature-card"><h2>Hành trình giao hàng</h2><p th:if="${order.estimatedDeliveryAt != null}" th:text="${'Dự kiến giao: ' + order.estimatedDeliveryAt}"></p><p th:if="${shipmentEvents.isEmpty()}">Chưa có cập nhật hành trình.</p><div th:each="e:${shipmentEvents}"><strong th:text="${e.status + ' · ' + e.carrier}"></strong><p th:text="${e.location}"></p><p th:text="${e.note}"></p><small th:text="${e.createdAt}"></small></div></section></div><div class="feature-main"><section class="feature-card" th:if="${order.paymentMethod == 'QR' and order.paymentStatus != 'PAID' and order.orderStatus != 'CANCELLED'}"><h2>Xác nhận chuyển khoản</h2><form th:action="@{/admin/orders/{id}/payment(id=${order.id})}" method="post"><label><input type="checkbox" name="received" value="true" required> Đã nhận đủ tiền của đơn này vào ngân hàng</label><button>Xác nhận thanh toán</button></form></section></div></body>
 </html>

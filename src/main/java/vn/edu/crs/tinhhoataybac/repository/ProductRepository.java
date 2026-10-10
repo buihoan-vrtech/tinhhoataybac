@@ -8,6 +8,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByFeaturedTrue();
+    List<Product> findByFamilyCodeOrderByIdAsc(String familyCode);
 
     List<Product> findByCategoryId(Long categoryId);
 

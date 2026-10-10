@@ -86,7 +86,7 @@ public class Product {
     }
 
     public Double getStock() {
-        return stock;
+        return getBatchTracked()?Math.round(getSaleBatches().stream().mapToDouble(ProductBatch::getRemainingQuantity).sum()*100.0)/100.0:stock;
     }
 
     public void setStock(Double stock) {
@@ -134,4 +134,39 @@ public class Product {
  public void validateQuantity(double quantity){
   if(!Double.isFinite(quantity)||quantity<getMinimumOrderQuantity()||java.math.BigDecimal.valueOf(quantity).stripTrailingZeros().scale()>2||java.math.BigDecimal.valueOf(quantity).subtract(java.math.BigDecimal.valueOf(getMinimumOrderQuantity())).remainder(java.math.BigDecimal.valueOf(getOrderQuantityStep())).signum()!=0)throw new IllegalStateException("Số lượng tối thiểu "+getMinimumOrderQuantity()+" "+unit+", bước tăng "+getOrderQuantityStep()+".");
  }
+
+ @Column(length=255) private String origin;
+ public String getOrigin(){return origin;} public void setOrigin(String value){origin=value;}
+
+ @Column(length=255) private String producer;
+ public String getProducer(){return producer;} public void setProducer(String value){producer=value;}
+
+ @Column(columnDefinition="TEXT") private String ingredients;
+ public String getIngredients(){return ingredients;} public void setIngredients(String value){ingredients=value;}
+
+ @Column(columnDefinition="TEXT") private String allergenInfo;
+ public String getAllergenInfo(){return allergenInfo;} public void setAllergenInfo(String value){allergenInfo=value;}
+
+ @Column(columnDefinition="TEXT") private String storageInstructions;
+ public String getStorageInstructions(){return storageInstructions;} public void setStorageInstructions(String value){storageInstructions=value;}
+
+ @Column(columnDefinition="TEXT") private String usageInstructions;
+ public String getUsageInstructions(){return usageInstructions;} public void setUsageInstructions(String value){usageInstructions=value;}
+
+ @Column(length=255) private String shelfLife;
+ public String getShelfLife(){return shelfLife;} public void setShelfLife(String value){shelfLife=value;}
+
+ @Column(length=80) private String familyCode;
+ public String getFamilyCode(){return familyCode;} public void setFamilyCode(String value){familyCode=value;}
+
+ @Column(length=100) private String variantLabel;
+ public String getVariantLabel(){return variantLabel;} public void setVariantLabel(String value){variantLabel=value;}
+
+ private Boolean batchTracked=false;
+ public Boolean getBatchTracked(){return Boolean.TRUE.equals(batchTracked);}
+ public void setBatchTracked(Boolean v){batchTracked=v;}
+ @OneToMany(mappedBy="product",fetch=FetchType.EAGER) private java.util.List<ProductBatch> batches=new java.util.ArrayList<>();
+ public java.util.List<ProductBatch> getBatches(){return batches;}
+ public java.util.List<ProductBatch> getSaleBatches(){return batches.stream().filter(b->b.isSellable(java.time.LocalDate.now())).sorted(java.util.Comparator.comparing(ProductBatch::getExpiresOn).thenComparing(ProductBatch::getId,java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))).toList();}
+ public java.time.LocalDate getNextExpiry(){return getSaleBatches().stream().map(ProductBatch::getExpiresOn).findFirst().orElse(null);}
 }

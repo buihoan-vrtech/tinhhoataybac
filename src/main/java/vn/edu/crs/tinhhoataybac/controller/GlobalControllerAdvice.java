@@ -8,19 +8,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import vn.edu.crs.tinhhoataybac.model.User;
 import vn.edu.crs.tinhhoataybac.service.CartService;
 import vn.edu.crs.tinhhoataybac.service.UserService;
+import vn.edu.crs.tinhhoataybac.repository.CategoryRepository;
+import vn.edu.crs.tinhhoataybac.model.Category;
+import java.util.List;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
     private final CartService cartService;
     private final UserService userService;
+    private final CategoryRepository categoryRepository;
 
     public GlobalControllerAdvice(
             CartService cartService,
-            UserService userService) {
+            UserService userService, CategoryRepository categoryRepository) {
 
         this.cartService = cartService;
         this.userService = userService;
+        this.categoryRepository = categoryRepository;
+    }
+
+    @ModelAttribute("navigationCategories")
+    public List<Category> navigationCategories() {
+        return categoryRepository.findAll();
     }
 
 

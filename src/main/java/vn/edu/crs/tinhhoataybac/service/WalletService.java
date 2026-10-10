@@ -371,4 +371,60 @@ public class WalletService {
                 transaction
         );
     }
+    @Transactional
+    public void refund(
+            User user,
+            BigDecimal amount,
+            String description,
+            String referenceCode) {
+
+        if (user == null) {
+            throw new IllegalArgumentException(
+                    "Người dùng không hợp lệ."
+            );
+        }
+
+        if (amount == null
+                || amount.compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Số tiền hoàn không hợp lệ."
+            );
+        }
+
+        Wallet wallet =
+                getOrCreateWallet(user);
+
+        BigDecimal currentBalance =
+                wallet.getBalance() == null
+                        ? BigDecimal.ZERO
+                        : wallet.getBalance();
+
+        BigDecimal newBalance =
+                currentBalance.add(amount);
+
+        wallet.setBalance(newBalance);
+
+        walletRepository.save(wallet);
+
+
+        WalletTransaction transaction =
+                new WalletTransaction();
+
+        transaction.setWallet(wallet);
+
+        transaction.setType("REFUND");
+
+        transaction.setAmount(amount);
+
+        transaction.setBalanceAfter(newBalance);
+
+        transaction.setDescription(description);
+
+        transaction.setReferenceCode(referenceCode);
+
+        transaction.setStatus("SUCCESS");
+
+        walletTransactionRepository.save(transaction);
+    }
 }

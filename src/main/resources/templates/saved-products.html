@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title th:text="${collectionTitle + ' | Tinh Hoa Tây Bắc'}"></title><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/catalog.css"></head>
+<body><div th:replace="~{fragments/header :: header}"></div>
+<section class="products-page-header"><div class="container"><p class="products-breadcrumb"><a href="/">Trang chủ</a> / <span th:text="${collectionTitle}"></span></p><h1 th:text="${collectionTitle}"></h1><p>Lưu lại hương vị bạn yêu thích và quay lại bất cứ lúc nào.</p></div></section>
+<main class="container saved-main" th:attr="data-collection=${collectionMode}">
+<div class="saved-toolbar"><div class="saved-tabs"><a href="/products/favorites" th:classappend="${collectionMode == 'favorites'} ? 'selected' : ''">♡ Yêu thích</a><a href="/products/recent" th:classappend="${collectionMode == 'recent'} ? 'selected' : ''">Đã xem gần đây</a></div><span class="saved-count" aria-live="polite"></span></div>
+<p class="saved-note">Danh sách lưu trên trình duyệt bạn đang sử dụng.</p>
+<p class="saved-loading" role="status">Đang tải sản phẩm…</p>
+<div class="product-grid saved-grid"></div>
+<div class="empty-products saved-empty" hidden><h2 th:text="${collectionMode == 'favorites' ? 'Bạn chưa lưu sản phẩm nào' : 'Bạn chưa xem sản phẩm nào'}"></h2><p th:text="${collectionMode == 'favorites' ? 'Nhấn trái tim trên sản phẩm để lưu vào danh sách này.' : 'Những sản phẩm bạn mở sẽ xuất hiện ở đây.'}"></p><a class="catalog-button" href="/products">Khám phá sản phẩm</a></div>
+<p class="saved-error catalog-error" role="alert" hidden>Chưa tải được sản phẩm. Vui lòng thử lại.</p><button class="catalog-button saved-retry" type="button" hidden>Thử lại</button>
+<noscript><p>Bật JavaScript để xem danh sách đã lưu trên trình duyệt này.</p></noscript>
+</main><div th:replace="~{fragments/footer :: footer}"></div><script src="/js/main.js"></script></body></html>

@@ -10,6 +10,7 @@
         th:fragment="header">
 
 
+    <link rel="stylesheet" href="/css/catalog.css">
     <!-- TOP BAR -->
 
     <div class="top-bar">
@@ -101,6 +102,7 @@
 <!-- ACTION -->
 
             <div class="header-actions">
+<a class="action-item saved-header-link" href="/products/favorites"><span class="action-icon">♡</span><div><small>Đã lưu</small><strong>Yêu thích <span data-favorites-count>0</span></strong></div></a>
 
 
                 <!-- CHƯA LOGIN -->
@@ -286,38 +288,7 @@
             </a>
 
 
-            <a th:href="@{/products(categoryId=1)}"
-               class="nav-link">
-
-                Thịt gác bếp
-
-            </a>
-
-
-            <a th:href="@{/products(categoryId=2)}"
-               class="nav-link">
-
-                Gia vị Tây Bắc
-
-            </a>
-
-
-            <a th:href="@{/products(categoryId=3)}"
-               class="nav-link">
-
-                Mật ong
-
-            </a>
-
-
-            <a th:href="@{/products(categoryId=4)}"
-               class="nav-link">
-
-                Chè Tây Bắc
-
-            </a>
-
-
+            <a href="/combos" class="nav-link">Combo &amp; quà tặng</a><a th:each="navCategory:${navigationCategories}" th:href="@{/products(categoryId=${navCategory.id})}" th:text="${navCategory.name}" class="nav-link"></a>
         </div>
 
     </nav>

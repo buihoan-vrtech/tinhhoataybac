@@ -14,7 +14,7 @@
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
-</head>
+<link rel="stylesheet" href="/css/gifts.css"></head>
 
 <body>
 
@@ -150,7 +150,7 @@
             </div>
 
 
-            <div class="success-actions">
+            <section class="gift-order" th:if="${order.giftWrapName != null or order.giftMessage != null or order.hidePrices}"><h3>Yêu cầu quà tặng</h3><p th:if="${order.giftWrapName != null}" th:text="${order.giftWrapName + ' · ' + #numbers.formatDecimal(order.giftWrapFee ?: 0,0,'POINT',0,'COMMA') + ' đ'}"></p><p th:if="${order.giftMessage != null}" th:text="${'Lời chúc: ' + order.giftMessage}"></p><p th:if="${order.hidePrices}">Không kèm giá trong kiện quà.</p></section><div class="success-actions">
 
 
                 <a th:href="@{/products}"

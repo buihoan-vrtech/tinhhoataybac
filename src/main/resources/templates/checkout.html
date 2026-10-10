@@ -14,7 +14,7 @@
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
 
-</head>
+<link rel="stylesheet" href="/css/registration.css"><link rel="stylesheet" href="/css/gifts.css"></head>
 
 <body>
 
@@ -152,7 +152,7 @@
                         Địa chỉ nhận hàng *
                     </label>
 
-                    <textarea name="address"
+                    <textarea name="address" data-address-search maxlength="500"
                               rows="3"
                               required
                               th:text="${user != null && user.address != null ? user.address : ''}"
@@ -161,6 +161,7 @@
                 </div>
 
 
+<section class="gift-choice"><h3>Gửi tặng người thân</h3><label for="gift-wrap">Hộp / gói quà</label><select name="giftWrapId" id="gift-wrap"><option value="">Không dùng hộp quà · 0 đ</option><option th:each="w:${giftWrapOptions}" th:value="${w.id}" th:selected="${selectedGiftWrapId != null and selectedGiftWrapId == w.id}" th:text="${w.name + ' · ' + #numbers.formatDecimal(w.price,0,'POINT',0,'COMMA') + ' đ'}"></option></select><label for="gift-message">Lời chúc trên thiệp (tùy chọn)</label><textarea id="gift-message" name="giftMessage" th:text="${giftMessageValue}" maxlength="500" rows="3" placeholder="Viết lời chúc gửi người nhận"></textarea><label><input type="checkbox" name="hidePrices" value="true" th:checked="${hidePricesSelected}"> Không kèm giá trong kiện quà</label><small>Shop giao đến tên và địa chỉ người nhận bạn nhập phía trên. Phí hộp quà được cộng rõ vào tổng thanh toán.</small></section>
                 <!-- NOTE -->
 
                 <div class="checkout-field">
@@ -178,7 +179,7 @@
 
 
                 <!-- ================================================= -->
-                <div style="margin:20px 0"><label>Địa chỉ đã lưu<select id="saved-address"><option value="">Nhập địa chỉ mới</option><option th:each="a:${addresses}" th:value="${a.id}" th:text="${a.label + ' · ' + a.addressDetail}" th:attr="data-name=${a.receiverName},data-phone=${a.phone},data-address=${a.addressDetail + ', ' + (a.ward ?: '') + ', ' + (a.district ?: '') + ', ' + (a.province ?: '')}"></option></select></label><p><a href="/account/addresses">Quản lý địa chỉ</a></p><label>Giao hàng<select name="shippingMethod"><option value="standard">Tiêu chuẩn · 25.000 đ</option><option value="fast">Nhanh · 35.000 đ</option><option value="express">Hỏa tốc · 50.000 đ</option></select></label><label>Mã giảm giá<input name="voucherCode" placeholder="Nhập mã voucher"></label><div id="checkout-quote" aria-live="polite" style="padding:16px;background:#edf3ea;border-radius:10px;margin-top:12px"><p>Tiền hàng: <strong id="quote-subtotal"></strong></p><p>Giao hàng: <strong id="quote-shipping"></strong></p><p>Giảm giá: <strong id="quote-discount"></strong></p><p>Tổng thanh toán: <strong id="quote-total"></strong></p><p id="quote-error" style="color:#a60000"></p></div></div>
+                <div style="margin:20px 0"><label>Địa chỉ đã lưu<select id="saved-address"><option value="">Nhập địa chỉ mới</option><option th:each="a:${addresses}" th:value="${a.id}" th:text="${a.label + ' · ' + a.addressDetail}" th:attr="data-name=${a.receiverName},data-phone=${a.phone},data-address=${a.addressDetail + ', ' + (a.ward ?: '') + ', ' + (a.district ?: '') + ', ' + (a.province ?: '')}"></option></select></label><p><a href="/account/addresses">Quản lý địa chỉ</a></p><label>Giao hàng<select name="shippingMethod"><option value="standard">Tiêu chuẩn · 25.000 đ</option><option value="fast">Nhanh · 35.000 đ</option><option value="express">Hỏa tốc · 50.000 đ</option></select></label><label>Mã giảm giá<input name="voucherCode" placeholder="Nhập mã voucher"></label><div id="checkout-quote" aria-live="polite" style="padding:16px;background:#edf3ea;border-radius:10px;margin-top:12px"><p>Tiền hàng: <strong id="quote-subtotal"></strong></p><p>Giao hàng: <strong id="quote-shipping"></strong></p><p>Hộp quà: <strong id="quote-gift"></strong></p><p>Giảm giá: <strong id="quote-discount"></strong></p><p>Tổng thanh toán: <strong id="quote-total"></strong></p><p id="quote-error" style="color:#a60000"></p></div></div>
 <!-- PAYMENT -->
                 <!-- ================================================= -->
 
@@ -443,7 +444,7 @@
                     </span>
 
                     <strong>
-                        Miễn phí
+                        <span id="summary-shipping">Đang tính…</span>
                     </strong>
 
                 </div>
@@ -451,13 +452,13 @@
 
                 <!-- TOTAL -->
 
-                <div class="checkout-total">
+                <div class="checkout-summary-row"><span>Hộp quà</span><strong id="summary-gift">Đang tính…</strong></div><div class="checkout-summary-row"><span>Giảm giá</span><strong id="summary-discount">Đang tính…</strong></div><div class="checkout-total">
 
                     <span>
                         Tổng thanh toán
                     </span>
 
-                    <strong th:text="${#numbers.formatDecimal(
+                    <strong id="summary-total" th:text="${#numbers.formatDecimal(
                     cartTotal,
                     0,
                     'POINT',
@@ -507,8 +508,5 @@
 <script th:src="@{/js/main.js}"></script>
 
 
-<script>document.getElementById('saved-address')?.addEventListener('change',function(){const o=this.selectedOptions[0];if(o.dataset.name){document.querySelector('[name=customerName]').value=o.dataset.name;document.querySelector('[name=phone]').value=o.dataset.phone;document.querySelector('[name=address]').value=o.dataset.address;}});</script><script>
-(()=>{const form=document.querySelector('form[action="/checkout/place-order"]');if(!form)return;let timer;const format=n=>new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(n);async function quote(){const body=new FormData(form);try{const response=await fetch('/checkout/quote',{method:'POST',body});const q=await response.json();document.getElementById('quote-error').textContent=q.error||'';if(response.ok){document.getElementById('quote-subtotal').textContent=format(q.subtotal);document.getElementById('quote-shipping').textContent=format(q.shippingFee);document.getElementById('quote-discount').textContent=format(q.discount);document.getElementById('quote-total').textContent=format(q.total);}else{document.getElementById('quote-total').textContent='Chưa tính được';}}catch(e){document.getElementById('quote-error').textContent='Chưa tải được tổng tiền. Vui lòng thử lại.';}}
-form.querySelector('[name=shippingMethod]')?.addEventListener('change',quote);form.querySelector('[name=voucherCode]')?.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(quote,350)});quote();})();
-</script></body>
+<script>document.getElementById('saved-address')?.addEventListener('change',function(){const o=this.selectedOptions[0];if(o.dataset.name){document.querySelector('[name=customerName]').value=o.dataset.name;document.querySelector('[name=phone]').value=o.dataset.phone;document.querySelector('[name=address]').value=o.dataset.address;}});</script><script src="/js/checkout-quote.js"></script><script src="/js/address-search.js"></script></body>
 </html>
