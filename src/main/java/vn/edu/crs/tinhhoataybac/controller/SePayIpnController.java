@@ -8,6 +8,8 @@ import java.util.Map;
 public class SePayIpnController {
  @org.springframework.beans.factory.annotation.Value("${sepay.gateway-order-payments-enabled:false}")
  private boolean gatewayOrderPaymentsEnabled;
+ @org.springframework.beans.factory.annotation.Value("${sepay.gateway-wallet-payments-enabled:false}")
+ private boolean gatewayWalletPaymentsEnabled;
  private final OrderService orders;
  private final WalletTopUpService wallets;
  private final SePayIpnVerifier verifier;
@@ -19,6 +21,7 @@ public class SePayIpnController {
    var payment=verifier.payment(payload);
    if(payment==null)return ResponseEntity.ok(Map.of("success",true));
    if(payment.code().startsWith("THB")&&!gatewayOrderPaymentsEnabled)return ResponseEntity.ok(Map.of("success",true,"paymentApplied",false));
+   if(payment.code().startsWith("NAP")&&!gatewayWalletPaymentsEnabled)return ResponseEntity.ok(Map.of("success",true,"paymentApplied",false));
    boolean applied=payment.code().startsWith("THB")?orders.markOrderPaid(payment.code(),payment.amount()):wallets.confirmTopUp(payment.code(),payment.amount());
    return ResponseEntity.ok(Map.of("success",true,"paymentApplied",applied));
   }catch(IllegalArgumentException e){return ResponseEntity.badRequest().body(Map.of("success",false));}

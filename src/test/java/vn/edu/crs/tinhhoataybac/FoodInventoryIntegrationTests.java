@@ -37,4 +37,13 @@ class FoodInventoryIntegrationTests{
   assertEquals("Thành phần kiểm thử",products.findById(p.getId()).orElseThrow().getIngredients());
   mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/products/"+p.getId())).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
  }
+ @Autowired ProductImageRepository galleryImages;
+ @Test void familyGalleryAndBankHolderRenderCorrectly() throws Exception {
+  Product a=new Product();a.setName("PHOTO TEST 1");a.setPrice(35000d);a.setStock(3d);a.setImage("/uploads/placeholder.svg");a.setFamilyCode("PHOTO-TEST");a.setVariantLabel("500 g");products.saveAndFlush(a);
+  Product b=new Product();b.setName("PHOTO TEST 2");b.setPrice(65000d);b.setStock(3d);b.setFamilyCode("PHOTO-TEST");b.setVariantLabel("1 kg");products.saveAndFlush(b);
+  ProductImage photo=new ProductImage();photo.setProduct(a);photo.setUrl("/uploads/real-photo.png");galleryImages.saveAndFlush(photo);
+  var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(context).apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
+  for(Product selected:java.util.List.of(a,b))mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/products/"+selected.getId())).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("/uploads/real-photo.png"))).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.model().attribute("photoGroup","family-PHOTO-TEST"));
+  mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/chinh-sach-thanh-toan")).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("Bùi Quang Hoàn")));
+ }
 }

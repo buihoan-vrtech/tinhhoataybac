@@ -190,7 +190,8 @@
 
 
 
-                <!-- ADMIN -->
+                <a th:if="${isAdmin}" href="/admin/chat" class="action-item">💬 Chat khách hàng</a>
+<!-- ADMIN -->
 
                 <a th:if="${isAdmin}"
                    th:href="@{/admin}"

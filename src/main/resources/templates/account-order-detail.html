@@ -24,7 +24,7 @@
     <link rel="stylesheet"
           th:href="@{/css/account.css(v=20261010)}">
 
-</head>
+<link rel="stylesheet" href="/css/order-center.css?v=20261012"></head>
 
 
 <body class="account-area">
@@ -216,7 +216,8 @@
         <!-- LAYOUT -->
         <!-- ================================================= -->
 
-        <div class="order-detail-layout">
+        <section class="order-journey" aria-label="Tiến trình đơn hàng"><div class="order-journey-heading"><h2>Theo dõi đơn hàng</h2><span th:text="${order.orderStatusLabel}"></span></div><p th:if="${order.orderStatus == 'CANCELLED'}" class="order-cancel-message">Đơn hàng đã hủy. Xem trạng thái thanh toán và hoàn tiền trong thông tin đơn.</p><ol th:unless="${order.orderStatus == 'CANCELLED'}"><li class="done"><span>1</span><strong>Đã đặt hàng</strong></li><li th:classappend="${order.orderStatus == 'CONFIRMED' or order.orderStatus == 'SHIPPING' or order.orderStatus == 'COMPLETED' ? 'done' : ''}"><span>2</span><strong>Chuẩn bị hàng</strong></li><li th:classappend="${order.orderStatus == 'SHIPPING' or order.orderStatus == 'COMPLETED' ? 'done' : ''}"><span>3</span><strong>Đang giao</strong></li><li th:classappend="${order.orderStatus == 'COMPLETED' ? 'done' : ''}"><span>4</span><strong>Đã giao hàng</strong></li></ol><p th:if="${order.paymentMethod == 'QR' and order.paymentStatus == 'PENDING' and order.orderStatus == 'PENDING'}">Đơn đang chờ xác nhận tiền chuyển khoản. <a th:href="@{/payment/qr/{id}(id=${order.id})}">Mở mã QR →</a></p><p class="order-journey-note">Tiến trình cập nhật theo trạng thái do shop xác nhận.</p></section>
+<div class="order-detail-layout">
 
 
             <!-- ================================================= -->

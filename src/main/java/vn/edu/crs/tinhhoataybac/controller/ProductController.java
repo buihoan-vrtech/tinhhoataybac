@@ -36,6 +36,14 @@ public class ProductController {
     m.addAttribute("reviews", list);
     m.addAttribute("ratingAverage", list.stream().mapToInt(r -> r.getRating()).average().orElse(0));
     m.addAttribute("gallery", images.findByProductIdOrderByIdAsc(id));
+    var family = p.getFamilyCode()==null||p.getFamilyCode().isBlank()?List.of(p):products.findByFamilyCodeOrderByIdAsc(p.getFamilyCode());
+    var media = new java.util.LinkedHashSet<String>();
+    images.findByProductIdOrderByIdAsc(id).stream().map(i->i.getUrl()).filter(u->u!=null&&!u.isBlank()).forEach(media::add);
+    for (var v:family) images.findByProductIdOrderByIdAsc(v.getId()).stream().map(i->i.getUrl()).filter(u->u!=null&&!u.isBlank()).forEach(media::add);
+    if (p.getImage()!=null&&!p.getImage().isBlank()) media.add(p.getImage());
+    m.addAttribute("productPhotos",new java.util.ArrayList<>(media));
+    m.addAttribute("photoGroup",p.getFamilyCode()==null||p.getFamilyCode().isBlank()?"product-"+id:"family-"+p.getFamilyCode());
+
     m.addAttribute("relatedProducts", p.getCategory() == null ? List.of() :
         products.findByCategoryId(p.getCategory().getId()).stream()
             .filter(other -> !id.equals(other.getId()))

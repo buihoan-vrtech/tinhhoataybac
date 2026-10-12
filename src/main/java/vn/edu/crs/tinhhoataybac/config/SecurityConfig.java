@@ -53,6 +53,7 @@ public class SecurityConfig {
          * ==========================================
          */
         http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/shop-chat", "/api/shop-chat/**").access(new org.springframework.security.web.access.expression.WebExpressionAuthorizationManager("hasRole('USER') and !hasRole('ADMIN')"))
                 .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**",
                         "/payment", "/payment/**", "/order-success/**",
                         "/wallet", "/wallet/**", "/api/payment/status/**")

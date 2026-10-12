@@ -5,6 +5,7 @@ import java.util.*;
 import vn.edu.crs.tinhhoataybac.model.Product;
 
 public final class CatalogBrowser {
+  private static final int PAGE_SIZE = 12;
   private CatalogBrowser() {}
 
   public static String normalize(String text) {
@@ -42,9 +43,9 @@ public final class CatalogBrowser {
         .filter(p -> !inStock || p.getStock() != null && p.getStock() > 0)
         .filter(p -> !offers || p.getEffectivePrice() < p.getPrice())
         .sorted(order.thenComparing(Product::getId)).toList();
-    int pages = Math.max(1, (matched.size() + 8) / 9);
+    int pages = Math.max(1, (matched.size() + PAGE_SIZE - 1) / PAGE_SIZE);
     int current = Math.max(0, Math.min(page, pages - 1));
-    int from = current * 9, to = Math.min(from + 9, matched.size());
+    int from = current * PAGE_SIZE, to = Math.min(from + PAGE_SIZE, matched.size());
     return new Result(matched.subList(from, to), matched.size(), current, pages,
         matched.isEmpty() ? 0 : from + 1, to);
   }

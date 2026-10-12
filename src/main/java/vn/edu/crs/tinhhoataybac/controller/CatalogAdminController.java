@@ -107,7 +107,7 @@ public class CatalogAdminController {
       p.setName(form.getName().trim());
       p.setPrice(form.getPrice());
       if(!p.getBatchTracked()) p.setStock(form.getStock());
-      p.setImage(form.getImage());
+      if (form.getImage()!=null && !form.getImage().isBlank()) p.setImage(form.getImage().trim());
       String uploaded = storage.save(imageFile);
       if (uploaded != null) p.setImage(uploaded);
       p.setDescription(form.getDescription());

@@ -35,8 +35,10 @@ class CatalogBrowserTests {
     for(long i=1;i<=14;i++) list.add(product(i,"Gạo "+i,50000,10,6));
     var last = CatalogBrowser.browse(list,"gao",6L,null,null,false,false,"newest",Integer.MAX_VALUE);
     assertEquals(14,last.total()); assertEquals(2,last.pages()); assertEquals(1,last.page());
-    assertEquals(5,last.items().size()); assertEquals(10,last.first()); assertEquals(14,last.last());
-    assertEquals(5L,last.items().getFirst().getId());
+    assertEquals(2,last.items().size()); assertEquals(13,last.first()); assertEquals(14,last.last());
+    assertEquals(2L,last.items().getFirst().getId());
+    var first=CatalogBrowser.browse(list,"gao",6L,null,null,false,false,"newest",0);
+    assertEquals(12,first.items().size()); assertEquals(1,first.first()); assertEquals(12,first.last());
   }
 
   @Test void emptyResultsAndInvalidBoundsAreHandled() {

@@ -80,6 +80,7 @@ public class WalletTopUpService {
         }
 
 
+        if (amount.stripTrailingZeros().scale()>0 || amount.compareTo(new BigDecimal("10000000"))>0) throw new IllegalArgumentException("Nạp từ 10.000 đến 10.000.000 đ, không có phần thập phân.");
         Wallet wallet =
                 walletService.getOrCreateWallet(user);
 
@@ -200,6 +201,7 @@ public class WalletTopUpService {
             BigDecimal receivedAmount) {
 
 
+        if (paymentCode==null || !paymentCode.matches("(?i)NAP[1-9][0-9]{0,18}")) return false;
         WalletTopUp topUp =
                 walletTopUpRepository.lockByCode(paymentCode.trim().toUpperCase(java.util.Locale.ROOT)).orElse(null);
 
@@ -222,10 +224,11 @@ public class WalletTopUpService {
 
 
         if(!"PENDING".equalsIgnoreCase(topUp.getStatus()))return false;
+        if (topUp.getCreatedAt()==null || !topUp.getCreatedAt().plusMinutes(30).isAfter(LocalDateTime.now())) return false;
         if (receivedAmount == null
                 || receivedAmount.compareTo(
                 topUp.getAmount()
-        ) < 0) {
+        ) != 0) {
 
             return false;
         }

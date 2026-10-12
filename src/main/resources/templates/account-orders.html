@@ -11,7 +11,7 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
-<link rel="stylesheet" href="/css/account.css?v=20261010"></head>
+<link rel="stylesheet" href="/css/account.css?v=20261010"><link rel="stylesheet" href="/css/order-center.css?v=20261012"></head>
 
 <body class="account-area">
 
@@ -68,7 +68,9 @@
 
             <main class="account-content">
 
-                <div class="orders-card">
+                <div class="orders-card" id="order-center">
+<div class="order-center-tools"><label for="order-search">Tìm đơn hàng<input id="order-search" type="search" placeholder="Mã đơn, mã thanh toán hoặc tên sản phẩm…" maxlength="120"></label><label for="order-filter">Trạng thái<select id="order-filter"><option value="all">Tất cả đơn hàng</option><option value="unpaid">Chờ thanh toán QR</option><option value="PENDING">Chờ xác nhận</option><option value="CONFIRMED">Đang chuẩn bị</option><option value="SHIPPING">Đang giao</option><option value="COMPLETED">Đã giao</option><option value="CANCELLED">Đã hủy</option></select></label></div><p id="order-result-count" class="order-result-count" role="status" aria-live="polite"></p><p id="order-no-results" hidden>Không có đơn phù hợp. Hãy đổi từ khóa hoặc trạng thái.</p>
+
 
 
                     <div class="orders-card-heading">
@@ -130,7 +132,7 @@
 
 
                         <article th:each="order : ${orders}"
-                                 class="order-history-item">
+                                 class="order-history-item" th:attr="data-order-status=${order.orderStatus},data-payment-status=${order.paymentStatus},data-payment-method=${order.paymentMethod}">
 
 
                             <div class="order-history-top">
@@ -168,7 +170,7 @@
                                         PAID
                                     </span>
 
-                                    <span class="order-status"
+                                    <span class="order-status" th:classappend="${order.orderStatus == 'CANCELLED' ? 'cancelled' : (order.orderStatus == 'COMPLETED' ? 'complete' : '')}"
                                           th:text="${order.orderStatusLabel}">
                                         CONFIRMED
                                     </span>
@@ -178,7 +180,8 @@
                             </div>
 
 
-                            <div class="order-history-body">
+                            <div class="order-preview-products"><div class="order-preview-product" th:each="item:${order.orderDetails}"><img th:if="${item.product != null and item.product.image != null}" th:src="${item.product.image}" th:alt="${item.product.name}" loading="lazy"><div><a th:if="${item.product != null}" th:href="@{/products/{id}(id=${item.product.id})}" th:text="${item.product.name}"></a><small th:text="${(item.variantSnapshot == null ? '' : item.variantSnapshot + ' · ') + 'Số lượng: ' + item.quantity}"></small></div></div></div>
+<div class="order-history-body">
 
                                 <div class="order-history-info">
 
@@ -238,6 +241,7 @@
                                     </strong>
 
 
+                                    <a class="order-pay-link" th:if="${order.paymentMethod == 'QR' and order.paymentStatus == 'PENDING' and order.orderStatus == 'PENDING'}" th:href="@{/payment/qr/{id}(id=${order.id})}">Thanh toán QR</a>
                                     <a th:href="@{/account/orders/{id}(id=${order.id})}">
                                         Xem chi tiết →
                                     </a>
@@ -264,5 +268,5 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
-</body>
+<script src="/js/order-center.js"></script></body>
 </html>

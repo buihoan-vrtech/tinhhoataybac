@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 @RequestMapping("/wallet/topup")
 public class WalletTopUpController {
 
+    private final vn.edu.crs.tinhhoataybac.service.BankQrService bankQr;
     private final UserService userService;
 
     private final WalletTopUpService walletTopUpService;
@@ -27,10 +28,12 @@ public class WalletTopUpController {
 
 
     public WalletTopUpController(
+            vn.edu.crs.tinhhoataybac.service.BankQrService bankQr,
             UserService userService,
             WalletTopUpService walletTopUpService,
             SePayService sePayService) {
 
+        this.bankQr=bankQr;
         this.userService = userService;
 
         this.walletTopUpService = walletTopUpService;
@@ -102,6 +105,7 @@ public class WalletTopUpController {
              *
              * 100000
              */
+            if (amount==null || !amount.trim().matches("(?:[0-9]+|[0-9]{1,3}(?:[.,][0-9]{3})+)")) throw new IllegalArgumentException("Nhập số tiền nguyên, ví dụ 50000 hoặc 50.000.");
             String cleanAmount =
                     amount
                             .replace(".", "")
@@ -237,31 +241,10 @@ public class WalletTopUpController {
         );
 
 
-        /*
-         * URL SePay Sandbox.
-         */
-        model.addAttribute(
-                "checkoutUrl",
-                sePayService.getCheckoutUrl()
-        );
-
-
-        /*
-         * Quan trọng:
-         *
-         * Dùng chính SePayService đang chạy
-         * thành công cho đơn hàng.
-         *
-         * Không dùng WalletTopUpPaymentService nữa.
-         */
-        model.addAttribute(
-                "sepayFields",
-                sePayService
-                        .buildWalletTopUpFields(topUp)
-        );
-
-
-        return "wallet-topup-checkout";
+        model.addAttribute("qrUrl",bankQr.topUpUrl(topUp));
+        model.addAttribute("bank",bankQr.bank());model.addAttribute("bankAccount",bankQr.account());model.addAttribute("bankHolder",bankQr.holder());
+        model.addAttribute("expiresAt",topUp.getCreatedAt().plusMinutes(30).atZone(java.time.ZoneId.systemDefault()).toInstant().toString());
+        return "wallet-topup-qr";
     }
 
 
@@ -367,6 +350,13 @@ public class WalletTopUpController {
      * LẤY USER ĐANG ĐĂNG NHẬP
      * =========================================================
      */
+    @GetMapping("/status/{id}") @ResponseBody
+    public org.springframework.http.ResponseEntity<?> status(@PathVariable Long id,Authentication a){
+        User user=getCurrentUser(a);WalletTopUp t=walletTopUpService.getById(id);
+        if(user==null||t==null||!t.getUser().getId().equals(user.getId()))return org.springframework.http.ResponseEntity.notFound().build();
+        return org.springframework.http.ResponseEntity.ok(java.util.Map.of("paid","PAID".equals(t.getStatus()),"status",t.getStatus(),"expired",!t.getCreatedAt().plusMinutes(30).isAfter(java.time.LocalDateTime.now())));
+    }
+
     private User getCurrentUser(
             Authentication authentication) {
 

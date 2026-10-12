@@ -40,4 +40,9 @@ class OwnershipCartPaymentTests {
   assertEquals("CANCELLED",o.getOrderStatus());assertEquals(3d,p.getStock());
   assertThrows(IllegalStateException.class,()->commerce.cancelByUser(o.getId(),u,"TEST"));assertEquals(3d,p.getStock());
  }
+ @Test void orderCenterShowsOnlyOwnedOrdersAndRealProgress() throws Exception {
+  var u=customer("order-center");var other=customer("order-center-other");var p=product();var own=order(u,p);var foreign=order(other,p);
+  mvc().perform(get("/account/orders").with(user(u.getEmail()))).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"order-search\""))).andExpect(model().attribute("orders",org.hamcrest.Matchers.hasSize(1)));
+  mvc().perform(get("/account/orders/"+own.getId()).with(user(u.getEmail()))).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("order-journey")));
+ }
 }

@@ -20,6 +20,7 @@ public class SePayWebhookController {
     @org.springframework.beans.factory.annotation.Value("${payment.qr.account-no:}")
     private String receivingAccount;
 
+    private final vn.edu.crs.tinhhoataybac.service.WalletTopUpService topUps;
     private final OrderService orderService;
 
     private final SePayTransactionRepository
@@ -27,9 +28,10 @@ public class SePayWebhookController {
 
 
     public SePayWebhookController(
-            OrderService orderService,
+            OrderService orderService, vn.edu.crs.tinhhoataybac.service.WalletTopUpService topUps,
             SePayTransactionRepository sePayTransactionRepository) {
 
+        this.topUps=topUps;
         this.orderService = orderService;
 
         this.sePayTransactionRepository =
@@ -95,7 +97,7 @@ public class SePayWebhookController {
              */
             String paymentCode = request.getCode();
             if (paymentCode == null || paymentCode.isBlank()) {
-                var match=java.util.regex.Pattern.compile("(?i)(?<![A-Z0-9])THB[1-9][0-9]{0,18}(?![A-Z0-9])").matcher(request.getContent() == null ? "" : request.getContent());
+                var match=java.util.regex.Pattern.compile("(?i)(?<![A-Z0-9])(?:THB|NAP)[1-9][0-9]{0,18}(?![A-Z0-9])").matcher(request.getContent() == null ? "" : request.getContent());
                 if (match.find()) paymentCode=match.group();
             }
             if (paymentCode != null) paymentCode=paymentCode.trim();
@@ -115,7 +117,7 @@ public class SePayWebhookController {
              */
             if (!paymentCode
                     .toUpperCase()
-                    .matches("THB[1-9][0-9]{0,18}")) {
+                    .matches("(?:THB|NAP)[1-9][0-9]{0,18}")) {
 
                 return ResponseEntity.ok(
                         Map.of("success", true)
@@ -127,10 +129,7 @@ public class SePayWebhookController {
              * Xác nhận đơn.
              */
             boolean paid =
-                    orderService.markOrderPaid(
-                            paymentCode.toUpperCase(),
-                            request.getTransferAmount()
-                    );
+                    paymentCode.toUpperCase().startsWith("NAP") ? topUps.confirmTopUp(paymentCode.toUpperCase(),request.getTransferAmount()) : orderService.markOrderPaid(paymentCode.toUpperCase(),request.getTransferAmount());
 
 
             /*
