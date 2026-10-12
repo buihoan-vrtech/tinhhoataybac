@@ -86,7 +86,8 @@ public class Product {
     }
 
     public Double getStock() {
-        return getBatchTracked()?Math.round(getSaleBatches().stream().mapToDouble(ProductBatch::getRemainingQuantity).sum()*100.0)/100.0:stock;
+        if (!getBatchTracked()) return stock;
+        return Math.round(getSaleBatches().stream().mapToDouble(ProductBatch::getRemainingQuantity).sum()*100.0)/100.0;
     }
 
     public void setStock(Double stock) {

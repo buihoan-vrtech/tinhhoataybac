@@ -35,3 +35,5 @@ build/
 # Uploaded customer and product media
 /uploads/
 /sepay-local.properties
+
+mail-local.properties

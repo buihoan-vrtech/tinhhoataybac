@@ -219,7 +219,7 @@
                 <a th:if="${loggedIn}" href="/account/notifications" class="action-item">🔔 Thông báo</a>
 <!-- CART -->
 
-                <a th:href="@{/cart}"
+                <a th:if="${!isAdmin}" th:href="@{/cart}"
                    class="action-item cart-action">
 
 

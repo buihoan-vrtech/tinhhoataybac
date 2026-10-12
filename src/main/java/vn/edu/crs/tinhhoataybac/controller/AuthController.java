@@ -9,9 +9,11 @@ import vn.edu.crs.tinhhoataybac.service.UserService;
 public class AuthController {
 
     private final UserService userService;
+    private final vn.edu.crs.tinhhoataybac.service.RegistrationVerificationService verification;
 
     public AuthController(
-            UserService userService) {
+            UserService userService, vn.edu.crs.tinhhoataybac.service.RegistrationVerificationService verification) {
+        this.verification = verification;
 
         this.userService = userService;
     }
@@ -40,7 +42,7 @@ public class AuthController {
             @RequestParam String confirmPassword,
             @RequestParam(defaultValue = "") String address,
             @RequestParam(defaultValue = "false") boolean termsAccepted,
-            Model model) {
+            Model model, jakarta.servlet.http.HttpSession session) {
 
         try {
 
@@ -78,14 +80,14 @@ public class AuthController {
                 );
             }
 
-            userService.register(
+            verification.start(session,
                     fullName,
                     email,
                     password,
                     phone, address
             );
 
-            return "redirect:/login?registered";
+            return "redirect:/register/verify";
 
         } catch (Exception e) {
             String registrationError = e instanceof IllegalStateException

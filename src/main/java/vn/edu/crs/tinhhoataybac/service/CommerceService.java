@@ -399,4 +399,14 @@ public class CommerceService {
       throw new IllegalStateException("Đơn đã hết thời gian thanh toán.");
     record(o, "Admin xác nhận đã nhận đủ tiền chuyển khoản", actor);
   }
+  @Transactional
+  public Order cancelByUser(Long id, User user, String reason) {
+    Order order = orderRepo.lockById(id).orElseThrow(() -> new IllegalStateException("Không tìm thấy đơn hàng."));
+    if (!owns(order, user)) throw new IllegalStateException("Bạn không có quyền với đơn này.");
+    if (!orders.canUserCancel(order)) throw new IllegalStateException("Đơn không còn đủ điều kiện tự hủy.");
+    if (reason != null && reason.length() > 1000) throw new IllegalStateException("Lý do hủy quá dài.");
+    Order cancelled = changeStatus(id, "CANCELLED", user.getEmail());
+    if (reason != null && !reason.isBlank()) record(cancelled, "Lý do khách hủy: " + reason.trim(), user.getEmail());
+    return cancelled;
+  }
 }

@@ -9,6 +9,12 @@ import java.util.Optional;
 public interface OrderRepository
         extends JpaRepository<Order, Long> {
 
+    @org.springframework.data.jpa.repository.Query("select o from Order o left join o.customer c where c.id=:userId or (o.customer is null and lower(o.email)=lower(:email)) order by o.createdAt desc")
+    List<Order> findOwned(@org.springframework.data.repository.query.Param("userId") Long userId, @org.springframework.data.repository.query.Param("email") String email);
+
+    @org.springframework.data.jpa.repository.Query("select o from Order o left join o.customer c where o.id=:id and (c.id=:userId or (o.customer is null and lower(o.email)=lower(:email)))")
+    Optional<Order> findOwnedById(@org.springframework.data.repository.query.Param("id") Long id, @org.springframework.data.repository.query.Param("userId") Long userId, @org.springframework.data.repository.query.Param("email") String email);
+
     Optional<Order> findByPaymentCode(String paymentCode);
 
     List<Order> findByEmailIgnoreCaseOrderByCreatedAtDesc(

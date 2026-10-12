@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 
 @Controller
 public class AccountController {
+    private final vn.edu.crs.tinhhoataybac.service.CommerceService commerce;
 
     private final OrderStatusHistoryRepository histories;
     private final OrderServiceRequestRepository requests;
@@ -37,6 +38,7 @@ public class AccountController {
 
 
     public AccountController(
+            vn.edu.crs.tinhhoataybac.service.CommerceService commerce,
             UserService userService,
             WalletService walletService,
             OrderService orderService,
@@ -44,6 +46,7 @@ public class AccountController {
             OrderServiceRequestRepository requests,
             ShipmentEventRepository shipmentEvents) {
 
+        this.commerce = commerce;
         this.userService = userService;
         this.walletService = walletService;
         this.orderService = orderService;
@@ -273,9 +276,9 @@ public class AccountController {
              * - COD hay QR/WALLET
              * - có phải hoàn tiền hay không
              */
-            orderService.cancelOrderByUser(
+            commerce.cancelByUser(
                     orderId,
-                    user.getEmail(),
+                    user,
                     reason
             );
 

@@ -53,6 +53,11 @@ public class SecurityConfig {
          * ==========================================
          */
         http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**",
+                        "/payment", "/payment/**", "/order-success/**",
+                        "/wallet", "/wallet/**", "/api/payment/status/**")
+                .access(new org.springframework.security.web.access.expression.WebExpressionAuthorizationManager(
+                        "hasRole('USER') and !hasRole('ADMIN')"))
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/products/*/reviews").authenticated()
 
 
@@ -76,7 +81,7 @@ public class SecurityConfig {
                         "/",
                         "/products/**",
                         "/login",
-                        "/register",
+                        "/register", "/register/**",
                         "/forgot-password", "/reset-password",
 
                         "/api/sepay/ipn",
@@ -87,7 +92,7 @@ public class SecurityConfig {
                 .permitAll()
 
                 .requestMatchers(org.springframework.http.HttpMethod.GET,"/combos").permitAll()
-                .requestMatchers("/combos/**").authenticated()
+                .requestMatchers("/combos/**").access(new org.springframework.security.web.access.expression.WebExpressionAuthorizationManager("hasRole('USER') and !hasRole('ADMIN')"))
 
 
                 /*

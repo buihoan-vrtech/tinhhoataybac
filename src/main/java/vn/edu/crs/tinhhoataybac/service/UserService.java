@@ -31,6 +31,10 @@ public class UserService implements UserDetailsService {
     }
 
     public User register(String fullName, String email, String password, String phone, String address) {
+        return userRepository.save(prepareRegistration(fullName,email,password,phone,address));
+    }
+
+    public User prepareRegistration(String fullName, String email, String password, String phone, String address) {
         if (address != null && address.length() > 500) throw new IllegalStateException("Địa chỉ tối đa 500 ký tự.");
         email = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
         if(fullName==null||fullName.isBlank()||fullName.length()>255||email==null||!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")||password==null||password.length()<8||password.length()>72)throw new IllegalStateException("Nhập tên, email hợp lệ và mật khẩu từ 8 đến 72 ký tự.");
@@ -62,9 +66,15 @@ public class UserService implements UserDetailsService {
         user.setRole("USER");
         user.setEnabled(true);
 
-        return userRepository.save(user);
+        return user;
     }
 
+
+    public User saveVerifiedRegistration(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) throw new IllegalStateException("Email này đã được sử dụng.");
+        user.setRole("USER"); user.setEnabled(true); user.setEmailVerifiedAt(java.time.LocalDateTime.now());
+        return userRepository.save(user);
+    }
 
     public User findByEmail(String email) {
 

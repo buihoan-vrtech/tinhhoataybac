@@ -11,6 +11,9 @@ import java.util.List;
 @Service
 public class CartService {
 
+    private final vn.edu.crs.tinhhoataybac.repository.ProductRepository products;
+    public CartService(vn.edu.crs.tinhhoataybac.repository.ProductRepository products) { this.products = products; }
+
     private static final String CART_SESSION_KEY = "cart";
 
 
@@ -28,7 +31,15 @@ public class CartService {
             return newCart;
         }
 
-        return (List<CartItem>) cartObject;
+        List<CartItem> cart = (List<CartItem>) cartObject;
+        var ids = cart.stream().map(i -> i.getProduct().getId()).distinct().toList();
+        var current = products.findAllById(ids).stream().collect(java.util.stream.Collectors.toMap(Product::getId, java.util.function.Function.identity()));
+        for (CartItem item : cart) {
+            Product fresh = current.get(item.getProduct().getId());
+            if (fresh != null) item.setProduct(fresh);
+        }
+        session.setAttribute(CART_SESSION_KEY, cart);
+        return cart;
     }
 
 
@@ -36,16 +47,20 @@ public class CartService {
                           Product product,
                           double quantity) {
 
+        product = products.findById(product.getId()).orElseThrow(() -> new IllegalStateException("Sản phẩm không còn tồn tại."));
         product.validateQuantity(quantity);
         List<CartItem> cart = getCart(session);
         if(product.getStock()==null||product.getStock()<=0||quantity<=0)throw new IllegalStateException("Sản phẩm đã hết hàng.");
+        if (quantity > product.getStock()) throw new IllegalStateException("Không đủ tồn kho.");
         for (CartItem item : cart) {
 
             if (item.getProduct().getId().equals(product.getId())) {
 
-                item.setQuantity(
-                        Math.min(product.getStock(), Math.round((item.getQuantity() + quantity)*100.0)/100.0)
-                );
+                double combined = Math.round((item.getQuantity() + quantity)*100.0)/100.0;
+                product.validateQuantity(combined);
+                if (combined > product.getStock()) throw new IllegalStateException("Tổng số lượng trong giỏ vượt tồn kho.");
+                item.setProduct(product);
+                item.setQuantity(combined);
 
                 session.setAttribute(CART_SESSION_KEY, cart);
 
@@ -87,6 +102,9 @@ public class CartService {
                     return;
                 }
 
+                Product fresh = item.getProduct();
+                fresh.validateQuantity(quantity);
+                if (fresh.getStock() == null || quantity > fresh.getStock()) throw new IllegalStateException("Không đủ tồn kho.");
                 item.setQuantity(quantity);
 
                 break;

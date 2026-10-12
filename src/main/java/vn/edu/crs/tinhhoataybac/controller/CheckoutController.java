@@ -98,6 +98,7 @@ public class CheckoutController {
   public String success(@PathVariable Long id, Authentication a, Model m) {
     Order o = orders.findById(id).orElse(null);
     if (!commerce.owns(o, users.findByEmail(a.getName()))) return "redirect:/account/orders";
+    if ("QR".equals(o.getPaymentMethod()) && !"PAID".equals(o.getPaymentStatus())) return "redirect:/payment/qr/" + id;
     m.addAttribute("order", o);
     return "order-success";
   }

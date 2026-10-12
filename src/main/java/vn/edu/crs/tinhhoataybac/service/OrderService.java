@@ -84,6 +84,7 @@ public class OrderService {
         order.setCustomerName(customerName);
         order.setPhone(phone);
         order.setEmail(email);
+        order.setCustomer(userService.findByEmail(email));
         order.setAddress(address);
         order.setNote(note);
 
@@ -867,10 +868,8 @@ public class OrderService {
         }
 
 
-        return orderRepository
-                .findByEmailIgnoreCaseOrderByCreatedAtDesc(
-                        email.trim()
-                );
+        User owner = userService.findByEmail(email.trim());
+        return owner == null ? List.of() : orderRepository.findOwned(owner.getId(), owner.getEmail());
     }
 
 
@@ -891,12 +890,8 @@ public class OrderService {
         }
 
 
-        return orderRepository
-                .findByIdAndEmailIgnoreCase(
-                        orderId,
-                        email.trim()
-                )
-                .orElse(null);
+        User owner = userService.findByEmail(email.trim());
+        return owner == null ? null : orderRepository.findOwnedById(orderId, owner.getId(), owner.getEmail()).orElse(null);
     }
 
 

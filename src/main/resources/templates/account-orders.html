@@ -61,7 +61,7 @@
                 </div>
 
 
-                <nav class="account-menu"><a href="/account" class="">Tổng quan</a><a href="/account/profile">Hồ sơ cá nhân</a><a href="/account/orders" class="active">Đơn hàng của tôi</a><a href="/account/addresses">Địa chỉ nhận hàng</a><a href="/account/notifications">Thông báo</a><a href="/wallet">Ví Tinh Hoa</a></nav>
+                <nav class="account-menu"><a href="/account" class="">Tổng quan</a><a href="/account/profile">Hồ sơ cá nhân</a><a href="/account/orders" class="active">Đơn hàng của tôi</a><a href="/account/addresses">Địa chỉ nhận hàng</a><a href="/account/notifications">Thông báo</a><a th:if="${!isAdmin}" href="/wallet">Ví Tinh Hoa</a></nav>
 
             </aside>
 

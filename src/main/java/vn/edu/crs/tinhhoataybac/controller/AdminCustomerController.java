@@ -11,7 +11,7 @@ import vn.edu.crs.tinhhoataybac.service.*;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminCustomerController {
+public class  AdminCustomerController {
   private final UserRepository users;
   private final OrderRepository orders;
   private final WalletService wallets;

@@ -185,12 +185,13 @@
 
 
 
+            <p th:if="${isAdmin}">Bạn đang xem sản phẩm với quyền quản trị. <a href="/admin/catalog">Quản lý sản phẩm →</a></p>
             <!-- ADD CART -->
 
             <form th:action="@{/cart/add}"
                   method="post"
                   class="detail-buy-box"
-                  th:if="${product.stock != null and product.stock > 0}">
+                  th:if="${!isAdmin and product.stock != null and product.stock > 0}">
 
 
                 <input type="hidden"
@@ -248,7 +249,7 @@
 
             <!-- OUT OF STOCK -->
 
-            <div th:if="${product.stock == null or product.stock <= 0}">
+            <div th:if="${!isAdmin and (product.stock == null or product.stock <= 0)}">
 
                 <button type="button"
                         class="add-to-cart-btn"

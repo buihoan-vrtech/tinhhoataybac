@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PolicyController {
+  private final vn.edu.crs.tinhhoataybac.service.BankQrService bankQr;
+  public PolicyController(vn.edu.crs.tinhhoataybac.service.BankQrService bankQr) { this.bankQr=bankQr; }
   @GetMapping("/chinh-sach-giao-hang")
   public String shipping() {
     return "policies/shipping";
@@ -26,7 +28,10 @@ public class PolicyController {
   }
 
   @GetMapping("/chinh-sach-thanh-toan")
-  public String payment() {
+  public String payment(org.springframework.ui.Model model) {
+    model.addAttribute("paymentBank",bankQr.bank());
+    model.addAttribute("paymentAccount",bankQr.account());
+    model.addAttribute("paymentHolder",bankQr.holder());
     return "policies/payment";
   }
 }
